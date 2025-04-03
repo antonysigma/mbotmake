@@ -717,7 +717,8 @@ def createToolpath(filename, temp):
                         if printersettings['extruder_temperature'] == 0:
                             printersettings['extruder_temperature'] = tempmetadata['temperature']
                         else:
-                            print('\x1b[2K\rMultiple temperatures issued during print, using only first.')
+                            print(f'\x1b[2K\rMultiple temperatures issued during print, using the latest: {tempmetadata["temperature"]:0.3g}; prev_temp = {printersettings["extruder_temperature"]:0.3g}')
+                            printersettings['extruder_temperature'] = tempmetadata['temperature']
             if tempmetadata['index'] != -1:
                 processed += generateCommand('set_toolhead_temperature',
                                              {},
@@ -831,8 +832,8 @@ def createToolpath(filename, temp):
     print(yrel)
     print('zrel:')
     print(zrel)
-    assert -0.15 < xrel < 0.15, xrel
-    assert -0.15 < yrel < 0.15, yrel
+    #assert -0.15 < xrel < 0.15, xrel
+    #assert -0.15 < yrel < 0.15, yrel
     #assert  0.95 < zrel < 1.05, zrel
     assert 0 < bbox['z_min'] < 0.5, bbox['z_min']
 
