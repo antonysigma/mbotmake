@@ -1,7 +1,10 @@
+import argparse
 import json
+import sys
 import zipfile
 from dataclasses import asdict
 from itertools import islice
+from pathlib import Path
 
 from mboxmake2.grammars.toolpath import grammar
 from mboxmake2.metafile import generateMetajson
@@ -11,7 +14,7 @@ from mboxmake2.validate import collectPrinterSettings
 
 
 def decodeGCodefile(
-    filename: str = "testcases/prusaslicer_gcode/cube.gcode",
+    filename: Path = Path("testcases/prusaslicer_gcode/cube.gcode"),
 ) -> ToolpathTransformer:
     with open(filename, "r") as file:
         transformer = ToolpathTransformer()
@@ -35,27 +38,49 @@ def packageMBotFile(filename, temp_dir: str) -> None:
         mbotfile.write(f"{temp_dir}/print.jsontoolpath", arcname="print.jsontoolpath")
 
 
-transformer = decodeGCodefile()
+def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
+    parser = argparse.ArgumentParser()
 
-# Checking toolpath
-printer_settings = collectPrinterSettings(
-    transformer.commands, transformer.z_transitions
-)
+    parser.add_argument("--SmartExtPlus", action="store_true")
+    parser.add_argument("--ToughExt", action="store_true")
+    parser.add_argument("input", type=Path)
 
-# Write to meta json file
-generateMetajson(
-    printer_settings, MachineType.REPLICATORPlUS, ExtruderType.SMARTEXTRUDERPLUS
-)
+    args = parser.parse_args(argv[1:])
 
-# Write to toolpath json file
-with open("print.jsontoolpath", "w") as toolpathfile:
-    toolpathfile.write("[\n")
+    if not (args.SmartExtPlus ^ args.ToughExt):
+        raise ValueError("Should not contain both extruder types")
 
-    for cmd in transformer.commands:
-        json.dump(asdict(cmd), toolpathfile)
-        toolpathfile.write(",\n")
+    if args.SmartExtPlus:
+        return (
+            args.input,
+            MachineType.REPLICATORPlUS,
+            ExtruderType.SMARTEXTRUDERPLUS,
+        )
 
-    json.dump(asdict(Command("comment", {"comment": "End of print"})), toolpathfile)
-    toolpathfile.write("\n]\n")
+    return parser.input, MachineType.REPLICATORPlUS, ExtruderType.TOUGHEXTRUDER
 
-packageMBotFile("output.makerbot", ".")
+
+if __name__ == "__main__":
+    input_file, machine_type, extruder_type = parseArgs(sys.argv)
+    transformer = decodeGCodefile(input_file)
+
+    # Checking toolpath
+    printer_settings = collectPrinterSettings(
+        transformer.commands, transformer.z_transitions
+    )
+
+    # Write to meta json file
+    generateMetajson(printer_settings, machine_type, extruder_type)
+
+    # Write to toolpath json file
+    with open("print.jsontoolpath", "w") as toolpathfile:
+        toolpathfile.write("[\n")
+
+        for cmd in transformer.commands:
+            json.dump(asdict(cmd), toolpathfile)
+            toolpathfile.write(",\n")
+
+        json.dump(asdict(Command("comment", {"comment": "End of print"})), toolpathfile)
+        toolpathfile.write("\n]\n")
+
+    packageMBotFile("output.makerbot", ".")
