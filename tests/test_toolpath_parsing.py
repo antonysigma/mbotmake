@@ -9,6 +9,7 @@ grammar = Grammar(STRICT + SYNTAX)
 
 def test_FanDuty() -> None:
     ast = grammar.parse("M106 S183.6\n")
+
     transformer = ToolpathTransformer()
     transformer.visit(ast)
     assert len(transformer.commands) == 1
@@ -17,10 +18,15 @@ def test_FanDuty() -> None:
     assert transformer.commands[0].parameters["value"] == approx(183.6 / 255)
 
 
+def test_MoveXY() -> None:
+    ast = grammar.parse("G1 F7200\n")
+    transformer = ToolpathTransformer()
+    transformer.visit(ast)
+
+
 def test_Move() -> None:
-    assert grammar.parse("G1 X-5.625 Y-7.102 E3.29059\n")
     assert grammar.parse("G1 E1.30602 F4200\n")
-    assert grammar.parse("G1 F7200\n")
+    assert grammar.parse("G1 X-5.625 Y-7.102 E3.29059\n")
 
 
 def test_ToggleFan() -> None:

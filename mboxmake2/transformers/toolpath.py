@@ -9,6 +9,7 @@ class ToolpathTransformer(NodeVisitor):
         self.commands: list[Command] = []
         self.printer_offset = Coords(0, 0, 0, 0)
         self.cursor = Coords(0, 0, 0, 0)
+        self.feedrate: float | None = None
 
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
@@ -30,6 +31,29 @@ class ToolpathTransformer(NodeVisitor):
         _, temperature = visited_children
         print(f"Overriding extruder temperature to: {temperature}")
         self.extruder_temperature = temperature
+
+    def visit_MoveE(self, _, visited_children) -> None:
+        _, (feedrate, extruder_position) = visited_children
+        self.feedrate = feedrate
+
+        if extruder_position is not None:
+            assert isinstance(extruder_position, Coords)
+            self.cursor = self.printer_offset + extruder_position
+
+    def visit_Coord2D(self, _, visited_children) -> Coords:
+        _, x, _, y, _, a = visited_children
+        return Coords(a, x, y, 0)
+
+    def visit_CoordZ(self, _, visited_children) -> tuple[float, Coords | None]:
+        optional_extruder_position, _, feedrate = visited_children
+        if isinstance(optional_extruder_position, Coords):
+            return feedrate / 60.0, optional_extruder_position
+
+        return feedrate, None
+
+    def visit_ExtruderPosition(self, _, visited_children) -> Coords:
+        _, value, _ = visited_children
+        return Coords(value, 0, 0, 0)
 
     def generic_visit(self, node, visited_children):
         """The generic visit method."""

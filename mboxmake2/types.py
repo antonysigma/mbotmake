@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+from enum import Enum
+from typing import Self
 
 
 @dataclass
@@ -15,3 +17,18 @@ class Coords:
     X: float
     Y: float
     Z: float
+
+    def __add__(self, x: Self):
+        return Coords(
+            self.A + x.A,
+            self.B + x.B,
+            self.C + x.C,
+            self.Z + x.Z,
+        )
+
+
+class MoveType(Enum):
+    TravelMove = "TravelMove"
+    Infill = "Infill"
+    Leaky = "LeakyTravelMove"
+    Retract = "Retract"
