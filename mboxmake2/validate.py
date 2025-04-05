@@ -1,4 +1,4 @@
-from mboxmake2.types import Command, PrinterSettings
+from mboxmake2.types import Command, MoveType, PrinterSettings
 
 
 def collectPrinterSettings(
@@ -16,7 +16,9 @@ def collectPrinterSettings(
     )
 
     printcoords = [
-        c.parameters for c in commands if set(c.tags) & {"Infill", "Leaky Travel Move"}
+        c.parameters
+        for c in commands
+        if set(c.tags) & {MoveType.Infill.value, MoveType.Leaky.value}
     ]
 
     bbox = {
@@ -37,7 +39,7 @@ def collectPrinterSettings(
     # assert -0.15 < yrel < 0.15, yrel
     # assert  0.95 < zrel < 1.05, zrel
     assert 0 < bbox["z_min"] < 0.5, (
-        f"Potential extrusion collision: zmin = {bbox['z_min']}"
+        f"Potential extrusion collision: z_min = {bbox['z_min']}"
     )
 
     return PrinterSettings(
