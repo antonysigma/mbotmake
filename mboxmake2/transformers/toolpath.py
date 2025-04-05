@@ -7,6 +7,20 @@ from mboxmake2.types import Command, CoordE, Coords, CoordZ, MoveType
 RELATIVE_MOVE = {"relative": {"a": False, "x": False, "y": False, "z": False}}
 
 
+class Logging:
+    unsupported_commands: set[str] = set()
+
+    def logUnsupportedCommand(self, line: str) -> None:
+        cmd = line.split(" ")[0]
+        assert cmd != "G1", f"Move command ignored: {line}"
+
+        if cmd in self.unsupported_commands:
+            return
+
+        print(f"Skipping command: {cmd}")
+        self.unsupported_commands.add(cmd)
+
+
 class ToolpathTransformer(NodeVisitor):
     def __init__(self):
         self.extruder_temperature: float | None = None
@@ -16,6 +30,7 @@ class ToolpathTransformer(NodeVisitor):
         self.current_z: float = 0
         self.feedrate: float | None = None
         self.z_transitions: int = 0
+        self.logging = Logging()
 
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
@@ -24,7 +39,7 @@ class ToolpathTransformer(NodeVisitor):
         return float(node.text)
 
     def visit_Unsupported(self, node, _) -> None:
-        print(f"Skipping command: {node.text}")
+        self.logging.logUnsupportedCommand(node.text)
 
     def visit_ToggleFan(self, _, __) -> None:
         self.commands.append(Command("toggle_fan", {"value": False}))
