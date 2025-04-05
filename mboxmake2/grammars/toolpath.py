@@ -27,14 +27,13 @@ Unsupported = ~r"[MG][0-9]+[^\n;]*"i
 AbsolutePositioning = "G90"
 ResetPosition = "G92 E" ("0.0" / "0")
 
-Move = MoveCommand (Coord2D / CoordE / CoordZ / Feedrate)
-CoordZ = " Z" Decimal Feedrate?
+Move = "G1" (Coord2D / CoordE / CoordZ / Feedrate)
+CoordZ = " Z" (Decimal / Integer) Feedrate?
 Coord2D = " X" Decimal " Y" Decimal ExtruderPosition? Feedrate?
 CoordE = ExtruderPosition Feedrate
 
 ExtruderPosition = " E" (Decimal / Integer)
 Feedrate = " F" (Decimal / Integer)
-MoveCommand = "G1"
 
 Integer = ~"[0-9]+"i
 Decimal = ~r"-?[0-9]+\.[0-9]+"i

@@ -125,7 +125,7 @@ class ToolpathTransformer(NodeVisitor):
         return Coords(0, x, y)
 
     def visit_CoordZ(self, _, visited_children) -> CoordZ:
-        _, z, optional_feedrate = visited_children
+        _, (z,), optional_feedrate = visited_children
 
         if isinstance(optional_feedrate, list):
             return CoordZ(z, optional_feedrate[0])
