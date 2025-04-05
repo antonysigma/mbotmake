@@ -38,9 +38,10 @@ def collectPrinterSettings(
     # assert -0.15 < xrel < 0.15, xrel
     # assert -0.15 < yrel < 0.15, yrel
     # assert  0.95 < zrel < 1.05, zrel
-    assert 0 < bbox["z_min"] < 0.5, (
+    assert bbox["z_min"] > 0.0, (
         f"Potential extrusion collision: z_min = {bbox['z_min']}"
     )
+    assert bbox["z_min"] <= 0.5, f"Potential print detachment: z_min = {bbox['z_min']}"
 
     return PrinterSettings(
         duration_s=0.0,

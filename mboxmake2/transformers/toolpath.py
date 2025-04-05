@@ -57,7 +57,11 @@ class ToolpathTransformer(NodeVisitor):
         _, temperature = visited_children
 
         if self.extruder_temperature is None or temperature > self.extruder_temperature:
-            print(f"Overriding extruder temperature to: {temperature}")
+            if self.extruder_temperature is not None:
+                print(
+                    "Overriding extruder temperature: "
+                    f"{self.extruder_temperature} -> {temperature}"
+                )
             self.extruder_temperature = temperature
 
         self.commands.append(
