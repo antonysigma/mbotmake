@@ -1,9 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
 class Command:
     function: str
-    metadata: dict
     parameters: dict
-    tags: list[str]
+    metadata: dict = field(default_factory=lambda: {})
+    tags: list[str] = field(default_factory=lambda: [])

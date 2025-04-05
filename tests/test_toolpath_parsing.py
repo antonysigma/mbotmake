@@ -23,8 +23,12 @@ def test_Move() -> None:
     assert grammar.parse("G1 F7200\n")
 
 
-def test_ToggleFam() -> None:
-    assert grammar.parse("M107\n")
+def test_ToggleFan() -> None:
+    ast = grammar.parse("M107\n")
+    transformer = ToolpathTransformer()
+    transformer.visit(ast)
+    assert len(transformer.commands) == 1
+    assert transformer.commands[0].function == "toggle_fan"
 
 
 def test_Comment() -> None:
