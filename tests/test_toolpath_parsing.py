@@ -8,7 +8,13 @@ grammar = Grammar(STRICT + SYNTAX)
 
 
 def test_FanDuty() -> None:
-    assert grammar.parse("M106 S183.6\n")
+    ast = grammar.parse("M106 S183.6\n")
+    transformer = ToolpathTransformer()
+    transformer.visit(ast)
+    assert len(transformer.commands) == 1
+    assert transformer.commands[0].function == "fan_duty"
+    assert "value" in transformer.commands[0].parameters
+    assert transformer.commands[0].parameters["value"] == approx(183.6 / 255)
 
 
 def test_Move() -> None:
