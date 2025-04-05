@@ -40,3 +40,15 @@ class Coords:
             return MoveType.Infill
 
         return MoveType.Retract
+
+
+@dataclass
+class CoordZ:
+    z: float
+    feedrate: float | None = None
+
+
+@dataclass
+class CoordE:
+    extruder_position: Coords
+    feedrate: float

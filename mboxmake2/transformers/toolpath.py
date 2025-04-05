@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from parsimonious.nodes import NodeVisitor
 
-from mboxmake2.types import Command, Coords, MoveType
+from mboxmake2.types import Command, CoordE, Coords, CoordZ, MoveType
 
 RELATIVE_MOVE = {"relative": {"a": False, "x": False, "y": False, "z": False}}
 
@@ -37,27 +37,38 @@ class ToolpathTransformer(NodeVisitor):
         print(f"Overriding extruder temperature to: {temperature}")
         self.extruder_temperature = temperature
 
-    def visit_MoveE(self, _, visited_children) -> None:
-        _, (feedrate, extruder_position) = visited_children
-        self.feedrate = feedrate
+    def visit_Move(self, node, visited_children) -> None:
+        _, (coords,) = visited_children
 
-        if extruder_position is None:
-            return
+        if isinstance(coords, Coords):
+            self.generateMove2DCommand(coords)
 
-        assert isinstance(extruder_position, Coords)
-        self.cursor = self.printer_offset + extruder_position
+        elif isinstance(coords, CoordE):
+            self.generateMoveECommand(coords)
 
+        elif isinstance(coords, CoordZ):
+            pass
+
+        elif isinstance(coords, float):
+            self.feedrate = coords
+
+        else:
+            print(f"Unknown move command: {node.text}, {coords}")
+
+    def generateMoveECommand(self, c: CoordE):
+        self.feedrate = c.feedrate
+
+        self.cursor = self.printer_offset + c.extruder_position
         self.commands.append(
             Command(
                 "move",
                 asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
                 metadata=RELATIVE_MOVE,
-                tags=[extruder_position.move_type.value],
+                tags=[c.extruder_position.move_type.value],
             )
         )
 
-    def visit_Move2D(self, _, visited_children) -> None:
-        _, coords = visited_children
+    def generateMove2DCommand(self, coords: Coords) -> None:
         self.cursor = self.printer_offset + coords
         tag = coords.move_type
         # if G0, tag = MoveType.TravelMove
@@ -75,15 +86,20 @@ class ToolpathTransformer(NodeVisitor):
         _, x, _, y, _, a = visited_children
         return Coords(a, x, y)
 
-    def visit_CoordZ(self, _, visited_children) -> tuple[float, Coords | None]:
-        optional_extruder_position, _, (feedrate,) = visited_children
-        normalized_feedrate = feedrate / 60.0
+    def visit_CoordZ(self, _, visited_children) -> CoordZ:
+        _, z, _, optional_feedrate = visited_children
 
-        if isinstance(optional_extruder_position, list):
-            assert isinstance(optional_extruder_position[0], Coords)
-            return normalized_feedrate, optional_extruder_position[0]
+        if isinstance(optional_feedrate, list):
+            return CoordZ(z, optional_feedrate[0])
 
-        return normalized_feedrate, None
+        return CoordZ(z)
+
+    def visit_CoordE(self, _, visited_children) -> CoordE:
+        extruder_position, feedrate = visited_children
+        return CoordE(extruder_position, feedrate)
+
+    def visit_Feedrate(self, _, visited_children) -> float:
+        return visited_children[1][0] / 60.0
 
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
         _, (value,), _ = visited_children
