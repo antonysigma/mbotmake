@@ -11,24 +11,32 @@ class Command:
     tags: list[str] = field(default_factory=lambda: [])
 
 
+class MoveType(Enum):
+    TravelMove = "TravelMove"
+    Infill = "Infill"
+    Leaky = "LeakyTravelMove"
+    Retract = "Retract"
+
+
 @dataclass
 class Coords:
     a: float  # Extruder position
     x: float
     y: float
-    z: float
 
     def __add__(self, x: Self):
         return Coords(
             self.a + x.a,
             self.x + x.x,
             self.y + x.y,
-            self.z + x.z,
         )
 
+    @property
+    def move_type(self) -> MoveType:
+        if self.a == 0:
+            return MoveType.Leaky
 
-class MoveType(Enum):
-    TravelMove = "TravelMove"
-    Infill = "Infill"
-    Leaky = "LeakyTravelMove"
-    Retract = "Retract"
+        if self.a > 0:
+            return MoveType.Infill
+
+        return MoveType.Retract

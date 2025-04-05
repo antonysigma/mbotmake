@@ -42,8 +42,21 @@ def test_MoveE() -> None:
     )
 
 
-def test_Move() -> None:
-    assert grammar.parse("G1 X-5.625 Y-7.102 E3.29059\n")
+def test_Move2D() -> None:
+    ast = grammar.parse("G1 X-5.625 Y-7.102 E3.29059\n")
+
+    transformer = ToolpathTransformer()
+    transformer.feedrate = 1234
+    transformer.visit(ast)
+
+    assert len(transformer.commands) == 1
+    assert transformer.commands[0].function == "move"
+    assert "a" in transformer.commands[0].parameters
+    assert transformer.commands[0].parameters["a"] == approx(3.29059)
+    assert transformer.commands[0].parameters["x"] == approx(-5.625)
+    assert transformer.commands[0].parameters["y"] == approx(-7.102)
+    assert transformer.commands[0].parameters["feedrate"] == 1234
+    assert transformer.commands[0].tags[0] == "Infill"
 
 
 def test_ToggleFan() -> None:

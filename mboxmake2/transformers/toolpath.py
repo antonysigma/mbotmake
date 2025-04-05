@@ -4,13 +4,16 @@ from parsimonious.nodes import NodeVisitor
 
 from mboxmake2.types import Command, Coords, MoveType
 
+RELATIVE_MOVE = {"relative": {"a": False, "x": False, "y": False, "z": False}}
+
 
 class ToolpathTransformer(NodeVisitor):
     def __init__(self):
         self.extruder_temperature: float | None = None
         self.commands: list[Command] = []
-        self.printer_offset = Coords(0, 0, 0, 0)
-        self.cursor = Coords(0, 0, 0, 0)
+        self.printer_offset = Coords(0, 0, 0)
+        self.cursor = Coords(0, 0, 0)
+        self.current_z: float = 0
         self.feedrate: float | None = None
 
     def visit_Integer(self, node, _) -> int:
@@ -42,27 +45,35 @@ class ToolpathTransformer(NodeVisitor):
             return
 
         assert isinstance(extruder_position, Coords)
-        a = extruder_position.a
-        if a == 0:
-            tag = MoveType.Leaky
-        elif a > 0:
-            tag = MoveType.Infill
-        else:
-            tag = MoveType.Retract
         self.cursor = self.printer_offset + extruder_position
 
         self.commands.append(
             Command(
                 "move",
-                asdict(self.cursor) | {"feedrate": self.feedrate},
-                metadata={"relative": {"a": False, "x": False, "y": False, "z": False}},
+                asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
+                metadata=RELATIVE_MOVE,
+                tags=[extruder_position.move_type.value],
+            )
+        )
+
+    def visit_Move2D(self, _, visited_children) -> None:
+        _, coords = visited_children
+        self.cursor = self.printer_offset + coords
+        tag = coords.move_type
+        # if G0, tag = MoveType.TravelMove
+
+        self.commands.append(
+            Command(
+                "move",
+                asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
+                metadata=RELATIVE_MOVE,
                 tags=[tag.value],
             )
         )
 
     def visit_Coord2D(self, _, visited_children) -> Coords:
         _, x, _, y, _, a = visited_children
-        return Coords(a, x, y, 0)
+        return Coords(a, x, y)
 
     def visit_CoordZ(self, _, visited_children) -> tuple[float, Coords | None]:
         optional_extruder_position, _, (feedrate,) = visited_children
@@ -76,7 +87,7 @@ class ToolpathTransformer(NodeVisitor):
 
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
         _, (value,), _ = visited_children
-        return Coords(value, 0, 0, 0)
+        return Coords(value, 0, 0)
 
     def generic_visit(self, node, visited_children):
         """The generic visit method."""
