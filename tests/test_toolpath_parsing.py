@@ -1,6 +1,8 @@
 from parsimonious.grammar import Grammar
+from pytest import approx
 
 from mboxmake2.grammars.toolpath import STRICT, SYNTAX
+from mboxmake2.transformers.toolpath import ToolpathTransformer
 
 grammar = Grammar(STRICT + SYNTAX)
 
@@ -33,3 +35,12 @@ def test_ResetPosition() -> None:
 
 def test_AbsolutePosition() -> None:
     assert grammar.parse("G90\n")
+
+
+def test_ToolheadTemperature() -> None:
+    ast = grammar.parse("M104 S180\n")
+
+    transformer = ToolpathTransformer()
+    transformer.visit(ast)
+    assert transformer.extruder_temperature is not None
+    assert transformer.extruder_temperature == approx(180)
