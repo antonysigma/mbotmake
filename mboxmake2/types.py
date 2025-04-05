@@ -52,3 +52,27 @@ class CoordZ:
 class CoordE:
     extruder_position: Coords
     feedrate: float
+
+
+@dataclass
+class PrinterSettings:
+    duration_s: float
+    total_commands: int
+    num_z_transitions: int
+    extruder_temperature: int
+    extrusion_distance_mm: float
+    bounding_box: dict
+
+
+class MachineType(Enum):
+    REPLICATOR5 = 1
+    REPLICATORPlUS = 2
+    REPLICATORMINI = 3
+    REPLICATORMINIPLUS = 4
+
+
+class ExtruderType(Enum):
+    SMARTEXTRUDER = 1
+    SMARTEXTRUDERPLUS = 2
+    TOUGHEXTRUDER = 3
+    EXPERIMENTALEXTRUDER = 4

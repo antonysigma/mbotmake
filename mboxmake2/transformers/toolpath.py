@@ -15,6 +15,7 @@ class ToolpathTransformer(NodeVisitor):
         self.cursor = Coords(0, 0, 0)
         self.current_z: float = 0
         self.feedrate: float | None = None
+        self.z_transitions: int = 0
 
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
@@ -56,7 +57,11 @@ class ToolpathTransformer(NodeVisitor):
             self.generateMoveECommand(coords)
 
         elif isinstance(coords, CoordZ):
-            pass
+            if coords.z > self.current_z:
+                self.z_transitions += 1
+                self.current_z = coords.z
+
+            self.generateMove2DCommand(Coords(0, 0, 0))
 
         elif isinstance(coords, float):
             self.feedrate = coords
