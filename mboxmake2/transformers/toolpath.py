@@ -1,6 +1,6 @@
 from parsimonious.nodes import NodeVisitor
 
-from mboxmake2.types import Command, Coords
+from mboxmake2.types import Command, Coords, MoveType
 
 
 class ToolpathTransformer(NodeVisitor):
@@ -36,20 +36,41 @@ class ToolpathTransformer(NodeVisitor):
         _, (feedrate, extruder_position) = visited_children
         self.feedrate = feedrate
 
-        if extruder_position is not None:
-            assert isinstance(extruder_position, Coords)
-            self.cursor = self.printer_offset + extruder_position
+        if extruder_position is None:
+            return
+
+        assert isinstance(extruder_position, Coords)
+        a = extruder_position.A
+        if a == 0:
+            tag = MoveType.Leaky
+        elif a > 0:
+            tag = MoveType.Infill
+        else:
+            tag = MoveType.Retract
+
+        self.cursor = self.printer_offset + extruder_position
+
+        self.commands.append(
+            Command(
+                "move",
+                self.cursor | {"feedrate": self.feedrate},
+                metadata={"relative": {"a": False, "x": False, "y": False, "z": False}},
+                tag=[str(tag)],
+            )
+        )
 
     def visit_Coord2D(self, _, visited_children) -> Coords:
         _, x, _, y, _, a = visited_children
         return Coords(a, x, y, 0)
 
     def visit_CoordZ(self, _, visited_children) -> tuple[float, Coords | None]:
-        optional_extruder_position, _, feedrate = visited_children
-        if isinstance(optional_extruder_position, Coords):
-            return feedrate / 60.0, optional_extruder_position
+        optional_extruder_position, _, (feedrate,) = visited_children
+        normalized_feedrate = feedrate / 60.0
 
-        return feedrate, None
+        if isinstance(optional_extruder_position, Coords):
+            return normalized_feedrate, optional_extruder_position
+
+        return normalized_feedrate, None
 
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
         _, value, _ = visited_children

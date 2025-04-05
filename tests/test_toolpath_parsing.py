@@ -23,6 +23,8 @@ def test_MoveXY() -> None:
     transformer = ToolpathTransformer()
     transformer.visit(ast)
 
+    assert transformer.feedrate == approx(7200 / 60.0)
+
 
 def test_Move() -> None:
     assert grammar.parse("G1 E1.30602 F4200\n")
