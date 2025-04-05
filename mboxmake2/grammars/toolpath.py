@@ -29,10 +29,10 @@ ResetPosition = "G92 E" ("0.0" / "0")
 
 Move = MoveCommand (Coord2D / CoordE / CoordZ / Feedrate)
 CoordZ = "Z" Decimal " " Feedrate?
-Coord2D = "X" Decimal " Y" Decimal " E" Decimal
-CoordE = ExtruderPosition Feedrate
+Coord2D = "X" Decimal " Y" Decimal " " (ExtruderPosition / Feedrate)
+CoordE = ExtruderPosition " " Feedrate
 
-ExtruderPosition = "E" (Decimal / Integer) " "
+ExtruderPosition = "E" (Decimal / Integer)
 Feedrate = "F" (Decimal / Integer)
 MoveCommand = "G1 "
 

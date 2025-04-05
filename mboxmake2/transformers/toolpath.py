@@ -22,6 +22,9 @@ class ToolpathTransformer(NodeVisitor):
     def visit_Decimal(self, node, _) -> float:
         return float(node.text)
 
+    def visit_Unsupported(self, node, _) -> None:
+        print(f"Skipping command: {node.text}")
+
     def visit_ToggleFan(self, _, __) -> None:
         self.commands.append(Command("toggle_fan", {"value": False}))
 
@@ -86,8 +89,12 @@ class ToolpathTransformer(NodeVisitor):
         )
 
     def visit_Coord2D(self, _, visited_children) -> Coords:
-        _, x, _, y, _, a = visited_children
-        return Coords(a, x, y)
+        _, x, _, y, _, (option,) = visited_children
+        if isinstance(option, Coords):
+            return Coords(option.a, x, y)
+
+        assert isinstance(option, float)
+        self.feedrate = option
 
     def visit_CoordZ(self, _, visited_children) -> CoordZ:
         _, z, _, optional_feedrate = visited_children
@@ -98,14 +105,14 @@ class ToolpathTransformer(NodeVisitor):
         return CoordZ(z)
 
     def visit_CoordE(self, _, visited_children) -> CoordE:
-        extruder_position, feedrate = visited_children
+        extruder_position, _, feedrate = visited_children
         return CoordE(extruder_position, feedrate)
 
     def visit_Feedrate(self, _, visited_children) -> float:
         return visited_children[1][0] / 60.0
 
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
-        _, (value,), _ = visited_children
+        _, (value,) = visited_children
         return Coords(value, 0, 0)
 
     def generic_visit(self, node, visited_children):
