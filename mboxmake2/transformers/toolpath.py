@@ -36,6 +36,9 @@ class ToolpathTransformer(NodeVisitor):
         _, temperature = visited_children
         print(f"Overriding extruder temperature to: {temperature}")
         self.extruder_temperature = temperature
+        self.commands.append(
+            Command("set_toolhead_temperature", {"temperature": temperature})
+        )
 
     def visit_Move(self, node, visited_children) -> None:
         _, (coords,) = visited_children
@@ -53,7 +56,7 @@ class ToolpathTransformer(NodeVisitor):
             self.feedrate = coords
 
         else:
-            print(f"Unknown move command: {node.text}, {coords}")
+            raise RuntimeError(f"Unknown move command: {node.text}, {coords}")
 
     def generateMoveECommand(self, c: CoordE):
         self.feedrate = c.feedrate
