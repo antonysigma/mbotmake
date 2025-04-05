@@ -36,7 +36,7 @@ ExtruderPosition = " E" Decimal
 Feedrate = " F" Decimal
 
 Integer = ~"[0-9]+"i
-Decimal = ~r"-?[0-9]+\.?[0-9]*"i
+Decimal = ~r"-?(\d+\.\d+|\d+|\.\d+)"i
 newline = "\n"
 """
 

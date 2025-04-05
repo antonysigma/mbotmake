@@ -12,7 +12,9 @@ class Logging:
 
     def logUnsupportedCommand(self, line: str) -> None:
         cmd = line.split(" ")[0]
-        assert cmd != "G1", f"Move command ignored: {line}"
+        assert not (cmd == "G1" and len(line.split(" ")) > 1), (
+            f"Move command ignored: {line}"
+        )
 
         if cmd in self.unsupported_commands:
             return
