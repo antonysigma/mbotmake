@@ -89,12 +89,17 @@ class ToolpathTransformer(NodeVisitor):
         )
 
     def visit_Coord2D(self, _, visited_children) -> Coords:
-        _, x, _, y, (option,) = visited_children
-        if isinstance(option, Coords):
-            return Coords(option.a, x, y)
+        _, x, _, y, extruder_position, feedrate = visited_children
 
-        assert isinstance(option, float)
-        self.feedrate = option
+        if isinstance(feedrate, list):
+            assert isinstance(feedrate[0], float)
+            self.feedrate = feedrate[0]
+
+        if isinstance(extruder_position, list):
+            assert isinstance(extruder_position[0], Coords)
+            return Coords(extruder_position[0].a, x, y)
+
+        return Coords(0, x, y)
 
     def visit_CoordZ(self, _, visited_children) -> CoordZ:
         _, z, optional_feedrate = visited_children
