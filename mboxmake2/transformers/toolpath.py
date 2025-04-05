@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 from parsimonious.nodes import NodeVisitor
 
 from mboxmake2.types import Command, Coords, MoveType
@@ -40,22 +42,21 @@ class ToolpathTransformer(NodeVisitor):
             return
 
         assert isinstance(extruder_position, Coords)
-        a = extruder_position.A
+        a = extruder_position.a
         if a == 0:
             tag = MoveType.Leaky
         elif a > 0:
             tag = MoveType.Infill
         else:
             tag = MoveType.Retract
-
         self.cursor = self.printer_offset + extruder_position
 
         self.commands.append(
             Command(
                 "move",
-                self.cursor | {"feedrate": self.feedrate},
+                asdict(self.cursor) | {"feedrate": self.feedrate},
                 metadata={"relative": {"a": False, "x": False, "y": False, "z": False}},
-                tag=[str(tag)],
+                tags=[tag.value],
             )
         )
 
@@ -67,13 +68,14 @@ class ToolpathTransformer(NodeVisitor):
         optional_extruder_position, _, (feedrate,) = visited_children
         normalized_feedrate = feedrate / 60.0
 
-        if isinstance(optional_extruder_position, Coords):
-            return normalized_feedrate, optional_extruder_position
+        if isinstance(optional_extruder_position, list):
+            assert isinstance(optional_extruder_position[0], Coords)
+            return normalized_feedrate, optional_extruder_position[0]
 
         return normalized_feedrate, None
 
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
-        _, value, _ = visited_children
+        _, (value,), _ = visited_children
         return Coords(value, 0, 0, 0)
 
     def generic_visit(self, node, visited_children):

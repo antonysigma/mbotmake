@@ -13,17 +13,17 @@ class Command:
 
 @dataclass
 class Coords:
-    A: float  # Extruder position
-    X: float
-    Y: float
-    Z: float
+    a: float  # Extruder position
+    x: float
+    y: float
+    z: float
 
     def __add__(self, x: Self):
         return Coords(
-            self.A + x.A,
-            self.B + x.B,
-            self.C + x.C,
-            self.Z + x.Z,
+            self.a + x.a,
+            self.x + x.x,
+            self.y + x.y,
+            self.z + x.z,
         )
 
 

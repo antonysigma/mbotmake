@@ -18,7 +18,7 @@ def test_FanDuty() -> None:
     assert transformer.commands[0].parameters["value"] == approx(183.6 / 255)
 
 
-def test_MoveXY() -> None:
+def test_SetFeedrate() -> None:
     ast = grammar.parse("G1 F7200\n")
     transformer = ToolpathTransformer()
     transformer.visit(ast)
@@ -26,8 +26,23 @@ def test_MoveXY() -> None:
     assert transformer.feedrate == approx(7200 / 60.0)
 
 
+def test_MoveE() -> None:
+    ast = grammar.parse("G1 E1.30602 F4200\n")
+
+    transformer = ToolpathTransformer()
+    transformer.visit(ast)
+    assert transformer.feedrate == approx(4200 / 60.0)
+
+    assert len(transformer.commands) == 1
+    assert transformer.commands[0].function == "move"
+    assert "a" in transformer.commands[0].parameters
+    assert transformer.commands[0].parameters["a"] == approx(1.30602)
+    assert transformer.commands[0].parameters["feedrate"] == approx(
+        transformer.feedrate
+    )
+
+
 def test_Move() -> None:
-    assert grammar.parse("G1 E1.30602 F4200\n")
     assert grammar.parse("G1 X-5.625 Y-7.102 E3.29059\n")
 
 
