@@ -79,10 +79,10 @@ def test_ResetPosition() -> None:
     ast = grammar.parse("G92 E0.0\n")
 
     transformer = ToolpathTransformer()
-    transformer.printer_offset.A = 123
-    transformer.cursor.A = 321
+    transformer.printer_offset.a = 123
+    transformer.cursor.a = 321
     transformer.visit(ast)
-    assert transformer.printer_offset.A == approx(transformer.cursor.A)
+    assert transformer.printer_offset.a == approx(transformer.cursor.a)
 
 
 def test_AbsolutePosition() -> None:

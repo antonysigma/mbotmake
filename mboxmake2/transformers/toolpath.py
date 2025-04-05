@@ -30,7 +30,7 @@ class ToolpathTransformer(NodeVisitor):
         self.commands.append(Command("fan_duty", {"value": value / 255.0}))
 
     def visit_ResetPosition(self, _, __) -> None:
-        self.printer_offset.A = self.cursor.A
+        self.printer_offset.a = self.cursor.a
 
     def visit_ToolheadTemperature(self, _, visited_children):
         _, temperature = visited_children
