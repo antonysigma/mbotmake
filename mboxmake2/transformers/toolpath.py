@@ -125,7 +125,7 @@ class ToolpathTransformer(NodeVisitor):
         return Coords(0, x, y)
 
     def visit_CoordZ(self, _, visited_children) -> CoordZ:
-        _, (z,), optional_feedrate = visited_children
+        _, z, optional_feedrate = visited_children
 
         if isinstance(optional_feedrate, list):
             return CoordZ(z, optional_feedrate[0])
@@ -137,10 +137,10 @@ class ToolpathTransformer(NodeVisitor):
         return CoordE(extruder_position, feedrate)
 
     def visit_Feedrate(self, _, visited_children) -> float:
-        return visited_children[1][0] / 60.0
+        return visited_children[1] / 60.0
 
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
-        _, (value,) = visited_children
+        _, value = visited_children
         return Coords(value, 0, 0)
 
     def generic_visit(self, node, visited_children):
