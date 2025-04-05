@@ -37,7 +37,7 @@ Feedrate = " F" (Decimal / Integer)
 MoveCommand = "G1"
 
 Integer = ~"[0-9]+"i
-Decimal = ~r"-?[1-9][0-9]*\.[0-9]+"i
+Decimal = ~r"-?[0-9]+\.[0-9]+"i
 newline = "\n"
 """
 
