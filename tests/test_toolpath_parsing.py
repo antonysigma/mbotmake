@@ -40,7 +40,13 @@ def test_Comment() -> None:
 
 def test_ResetPosition() -> None:
     assert grammar.parse("G92 E0\n")
-    assert grammar.parse("G92 E0.0\n")
+    ast = grammar.parse("G92 E0.0\n")
+
+    transformer = ToolpathTransformer()
+    transformer.printer_offset.A = 123
+    transformer.cursor.A = 321
+    transformer.visit(ast)
+    assert transformer.printer_offset.A == approx(transformer.cursor.A)
 
 
 def test_AbsolutePosition() -> None:

@@ -1,12 +1,14 @@
 from parsimonious.nodes import NodeVisitor
 
-from mboxmake2.types import Command
+from mboxmake2.types import Command, Coords
 
 
 class ToolpathTransformer(NodeVisitor):
     def __init__(self):
         self.extruder_temperature: float | None = None
         self.commands: list[Command] = []
+        self.printer_offset = Coords(0, 0, 0, 0)
+        self.cursor = Coords(0, 0, 0, 0)
 
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
@@ -20,6 +22,9 @@ class ToolpathTransformer(NodeVisitor):
     def visit_FanDuty(self, _, visited_children) -> None:
         _, value = visited_children
         self.commands.append(Command("fan_duty", {"value": value / 255.0}))
+
+    def visit_ResetPosition(self, _, __) -> None:
+        self.printer_offset.A = self.cursor.A
 
     def visit_ToolheadTemperature(self, _, visited_children):
         _, temperature = visited_children
