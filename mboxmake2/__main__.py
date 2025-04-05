@@ -1,4 +1,5 @@
 import json
+import zipfile
 from dataclasses import asdict
 from itertools import islice
 
@@ -25,6 +26,15 @@ def decodeGCodefile(
     return transformer
 
 
+def packageMBotFile(filename, temp_dir: str) -> None:
+    with zipfile.ZipFile(filename, "w", compression=zipfile.ZIP_DEFLATED) as mbotfile:
+        # for tn in tnNames:
+        #    mbotfile.write(tn.format(temp), arcname=tn.strip("{}/"))
+
+        mbotfile.write(f"{temp_dir}/meta.json", arcname="meta.json")
+        mbotfile.write(f"{temp_dir}/print.jsontoolpath", arcname="print.jsontoolpath")
+
+
 transformer = decodeGCodefile()
 
 # Checking toolpath
@@ -47,3 +57,5 @@ with open("print.jsontoolpath", "w") as toolpathfile:
 
     json.dump(asdict(Command("comment", {"comment": "End of print"})), toolpathfile)
     toolpathfile.write("\n]\n")
+
+packageMBotFile("output.makerbot", ".")
