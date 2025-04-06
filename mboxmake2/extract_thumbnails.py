@@ -10,7 +10,7 @@ def extractThumbnails(
     filename: Path = Path("testcases/prusaslicer_gcode/cube.gcode"),
 ) -> None:
     with open(filename, "r") as file:
-        ast = grammar.parse(file.read(5_000_000))
+        ast = grammar.match(file.read(5_000_000))
 
     decoder = ThumbnailDecoder()
     thumbnails = decoder.visit(ast)

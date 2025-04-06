@@ -1,9 +1,10 @@
 from parsimonious.grammar import Grammar
 
-from mboxmake2.grammars.thumbnails import SYNTAX
+from mboxmake2.grammars.thumbnails import grammar
 from mboxmake2.transformers.thumbnails import ThumbnailDecoder
 
-thumbnail_raw = r""";
+thumbnail_raw = r"""
+;
 ; thumbnail begin 55x40 2736
 ; iVBORw0KGgoAAAANSUhEUgAAADcAAAAoCAYAAABaW2IIAAAHyUlEQVR4Ae1ZW09UVxQ+f6GV68wAA2
 ; MrrUi1rdaW1hgvGAFFxduIAqIjIBcZLoogiFw0ggS8EJTgLUpMTNTE2JDeEtM21pja1Afb0MbUpCbl
@@ -45,11 +46,9 @@ thumbnail_raw = r""";
 ;
 """
 
-grammar = Grammar(SYNTAX)
-
 
 def test_thumbnail_parsing() -> None:
-    ast = grammar.parse(thumbnail_raw)
+    ast = grammar["Thumbnail"].match(thumbnail_raw)
 
     decoder = ThumbnailDecoder()
     raw = decoder.visit(ast)

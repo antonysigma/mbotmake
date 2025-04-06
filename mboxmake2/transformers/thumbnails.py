@@ -13,16 +13,14 @@ class ImageMetadata:
 
 class ThumbnailDecoder(NodeVisitor):
     def visit_Document(self, _, visited_children) -> list[bytes]:
-        _, _, first_thumbnail, other_thumbnails = visited_children
+        _, thumbnails = visited_children
 
-        assert isinstance(other_thumbnails, list)
-        for _, new_thumbnail in other_thumbnails:
-            first_thumbnail.append(new_thumbnail)
-
-        return first_thumbnail
+        assert isinstance(thumbnails, list)
+        assert isinstance(thumbnails[0], bytes)
+        return thumbnails
 
     def visit_Thumbnail(self, _, visited_children) -> bytes:
-        _, chunks, _ = visited_children
+        _, _, chunks, _ = visited_children
 
         assert isinstance(chunks, list)
         encoded = "".join(chunks)
