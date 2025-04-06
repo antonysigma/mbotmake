@@ -1,5 +1,6 @@
 import json
 from dataclasses import asdict
+from pathlib import Path
 from uuid import uuid4
 
 from mboxmake2.types import ExtruderType, MachineType, PrinterSettings
@@ -82,6 +83,7 @@ def metaJsonExperimentalExtruderPlus(meta: dict):
 
 
 def generateMetajson(
+    outfile: Path,
     printer_settings: PrinterSettings,
     machinetype: MachineType,
     extrudertype: ExtruderType,
@@ -123,5 +125,5 @@ def generateMetajson(
     vardict["extrusion_masses_g"] = [vardict["extrusion_mass_g"]]
     vardict["uuid"] = str(uuid4())
 
-    with open("meta.json", "w") as metafile:
+    with open(outfile, "w") as metafile:
         json.dump(meta | vardict, metafile, indent=2)

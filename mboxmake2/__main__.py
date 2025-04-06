@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+import tempfile
 import zipfile
 from dataclasses import asdict
 from itertools import islice
@@ -30,13 +31,15 @@ def decodeGCodefile(
     return transformer
 
 
-def packageMBotFile(filename, temp_dir: str) -> None:
+def packageMBotFile(
+    filename: Path, temp_dir: Path, thumbnail_paths: list[Path]
+) -> None:
     with zipfile.ZipFile(filename, "w", compression=zipfile.ZIP_DEFLATED) as mbotfile:
-        # for tn in tnNames:
-        #    mbotfile.write(tn.format(temp), arcname=tn.strip("{}/"))
+        for tn in thumbnail_paths:
+            mbotfile.write(tn, arcname=tn.name)
 
-        mbotfile.write(f"{temp_dir}/meta.json", arcname="meta.json")
-        mbotfile.write(f"{temp_dir}/print.jsontoolpath", arcname="print.jsontoolpath")
+        mbotfile.write(temp_dir / "meta.json", arcname="meta.json")
+        mbotfile.write(temp_dir / "print.jsontoolpath", arcname="print.jsontoolpath")
 
 
 def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
@@ -64,27 +67,38 @@ def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
 if __name__ == "__main__":
     input_file, machine_type, extruder_type = parseArgs(sys.argv)
 
-    extractThumbnails(input_file)
+    with tempfile.TemporaryDirectory() as tmpdir_name:
+        temp_dir = Path(tmpdir_name)
 
-    transformer = decodeGCodefile(input_file)
+        thumbnail_paths = extractThumbnails(input_file, temp_dir)
 
-    # Checking toolpath
-    printer_settings = collectPrinterSettings(
-        transformer.commands, transformer.z_transitions
-    )
+        transformer = decodeGCodefile(input_file)
 
-    # Write to meta json file
-    generateMetajson(printer_settings, machine_type, extruder_type)
+        # Checking toolpath
+        printer_settings = collectPrinterSettings(
+            transformer.commands, transformer.z_transitions
+        )
 
-    # Write to toolpath json file
-    with open("print.jsontoolpath", "w") as toolpathfile:
-        toolpathfile.write("[\n")
+        # Write to meta json file
+        print("Generating meta.json...")
+        generateMetajson(
+            temp_dir / "meta.json", printer_settings, machine_type, extruder_type
+        )
 
-        for cmd in transformer.commands:
-            json.dump(asdict(cmd), toolpathfile)
-            toolpathfile.write(",\n")
+        # Write to toolpath json file
+        print("Generating print.jsontoolpath...")
+        with open(temp_dir / "print.jsontoolpath", "w") as toolpathfile:
+            toolpathfile.write("[\n")
 
-        json.dump(asdict(Command("comment", {"comment": "End of print"})), toolpathfile)
-        toolpathfile.write("\n]\n")
+            for cmd in transformer.commands:
+                json.dump(asdict(cmd), toolpathfile)
+                toolpathfile.write(",\n")
 
-    packageMBotFile("output.makerbot", ".")
+            json.dump(
+                asdict(Command("comment", {"comment": "End of print"})), toolpathfile
+            )
+            toolpathfile.write("\n]\n")
+
+        output_file = input_file.with_suffix(".makerbot")
+        print(f"Generating {output_file.name}...")
+        packageMBotFile(output_file, temp_dir, thumbnail_paths)
