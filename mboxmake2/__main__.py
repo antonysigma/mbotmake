@@ -6,7 +6,8 @@ from dataclasses import asdict
 from itertools import islice
 from pathlib import Path
 
-from mboxmake2.grammars.toolpath import grammar
+from mboxmake2.extract_thumbnails import extractThumbnails
+from mboxmake2.grammars.toolpath import grammar as toolpath_grammar
 from mboxmake2.metafile import generateMetajson
 from mboxmake2.transformers.toolpath import ToolpathTransformer
 from mboxmake2.types import Command, ExtruderType, MachineType
@@ -23,7 +24,7 @@ def decodeGCodefile(
             if not next_n_lines:
                 break
 
-            ast = grammar.parse("\n".join(next_n_lines))
+            ast = toolpath_grammar.parse("\n".join(next_n_lines))
             transformer.visit(ast)
 
     return transformer
@@ -62,6 +63,9 @@ def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
 
 if __name__ == "__main__":
     input_file, machine_type, extruder_type = parseArgs(sys.argv)
+
+    extractThumbnails(input_file)
+
     transformer = decodeGCodefile(input_file)
 
     # Checking toolpath
