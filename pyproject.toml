@@ -9,7 +9,7 @@ dependencies = [
     'parsimonious',
     'progressbar2',
 ]
-name = "mboxmake2"
+name = "mbotmake2"
 version = "0.0.1"
 
 [project.optional-dependencies]
@@ -41,10 +41,13 @@ max-complexity = 30
 
 [tool.setuptools]
 packages = [
-    "mboxmake2",
-    "mboxmake2.grammars",
-    "mboxmake2.transformers",
+    "mbotmake2",
+    "mbotmake2.grammars",
+    "mbotmake2.transformers",
 ]
 
 [tool.setuptools.package-dir]
 mboxmake2 = "mboxmake2"
+
+[tool.setuptools.package-data]
+'printerconfigs' = ['*.json']

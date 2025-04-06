@@ -1,9 +1,10 @@
 import json
 from dataclasses import asdict
+from importlib import resources
 from pathlib import Path
 from uuid import uuid4
 
-from mboxmake2.types import ExtruderType, MachineType, PrinterSettings
+from mbotmake2.types import ExtruderType, MachineType, PrinterSettings
 
 
 def metaJson5th(meta: dict):
@@ -82,13 +83,16 @@ def metaJsonExperimentalExtruderPlus(meta: dict):
     return meta
 
 
+METAJSON_PATH = Path(resources.files("mbotmake2")) / "templates/Makerbot_RepPlus.meta.json"
+
+
 def generateMetajson(
     outfile: Path,
     printer_settings: PrinterSettings,
     machinetype: MachineType,
     extrudertype: ExtruderType,
 ) -> None:
-    with open("printerconfigs/Makerbot_RepPlus.meta.json", "r") as metajson:
+    with open(METAJSON_PATH, "r") as metajson:
         meta = json.load(metajson)
 
     match machinetype:

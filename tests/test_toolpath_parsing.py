@@ -37,9 +37,7 @@ def test_MoveE() -> None:
     assert transformer.commands[0].function == "move"
     assert "a" in transformer.commands[0].parameters
     assert transformer.commands[0].parameters["a"] == approx(1.30602)
-    assert transformer.commands[0].parameters["feedrate"] == approx(
-        transformer.feedrate
-    )
+    assert transformer.commands[0].parameters["feedrate"] == approx(transformer.feedrate)
 
 
 def test_Move2D() -> None:

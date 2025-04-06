@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from mboxmake2.grammars.thumbnails import grammar
-from mboxmake2.transformers.thumbnails import PNGImage, ThumbnailDecoder
+from mbotmake2.grammars.thumbnails import grammar
+from mbotmake2.transformers.thumbnails import PNGImage, ThumbnailDecoder
 
 
 def extractThumbnails(filename: Path, output_dir: Path) -> list[Path]:

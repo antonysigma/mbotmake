@@ -8,13 +8,13 @@ from dataclasses import asdict
 from itertools import islice
 from pathlib import Path
 
-from mboxmake2.extract_thumbnails import extractThumbnails
-from mboxmake2.grammars.toolpath import grammar as toolpath_grammar
-from mboxmake2.metafile import generateMetajson
-from mboxmake2.progress import newProgressBar
-from mboxmake2.transformers.toolpath import ToolpathTransformer
-from mboxmake2.types import Command, ExtruderType, MachineType
-from mboxmake2.validate import collectPrinterSettings
+from mbotmake2.extract_thumbnails import extractThumbnails
+from mbotmake2.grammars.toolpath import grammar as toolpath_grammar
+from mbotmake2.metafile import generateMetajson
+from mbotmake2.progress import newProgressBar
+from mbotmake2.transformers.toolpath import ToolpathTransformer
+from mbotmake2.types import Command, ExtruderType, MachineType
+from mbotmake2.validate import collectPrinterSettings
 
 
 def countNewlines(file: Path) -> int:
@@ -46,9 +46,7 @@ def decodeGCodefile(filename: Path) -> ToolpathTransformer:
     return transformer
 
 
-def packageMBotFile(
-    filename: Path, temp_dir: Path, thumbnail_paths: list[Path]
-) -> None:
+def packageMBotFile(filename: Path, temp_dir: Path, thumbnail_paths: list[Path]) -> None:
     with zipfile.ZipFile(filename, "w", compression=zipfile.ZIP_DEFLATED) as mbotfile:
         for tn in thumbnail_paths:
             mbotfile.write(tn, arcname=tn.name)
@@ -90,15 +88,11 @@ if __name__ == "__main__":
         transformer = decodeGCodefile(input_file)
 
         # Checking toolpath
-        printer_settings = collectPrinterSettings(
-            transformer.commands, transformer.z_transitions
-        )
+        printer_settings = collectPrinterSettings(transformer.commands, transformer.z_transitions)
 
         # Write to meta json file
         print("Generating meta.json...")
-        generateMetajson(
-            temp_dir / "meta.json", printer_settings, machine_type, extruder_type
-        )
+        generateMetajson(temp_dir / "meta.json", printer_settings, machine_type, extruder_type)
 
         # Write to toolpath json file
         print("Generating print.jsontoolpath...")
@@ -109,9 +103,7 @@ if __name__ == "__main__":
                 json.dump(asdict(cmd), toolpathfile)
                 toolpathfile.write(",\n")
 
-            json.dump(
-                asdict(Command("comment", {"comment": "End of print"})), toolpathfile
-            )
+            json.dump(asdict(Command("comment", {"comment": "End of print"})), toolpathfile)
             toolpathfile.write("\n]\n")
 
         output_file = input_file.with_suffix(".makerbot")

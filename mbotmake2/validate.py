@@ -1,25 +1,13 @@
-from mboxmake2.types import Command, MoveType, PrinterSettings
+from mbotmake2.types import Command, MoveType, PrinterSettings
 
 
-def collectPrinterSettings(
-    commands: list[Command], z_transitions: int
-) -> PrinterSettings:
+def collectPrinterSettings(commands: list[Command], z_transitions: int) -> PrinterSettings:
     toolpathfilelength = len(commands)
-    extrusion_distance = max(
-        c.parameters["a"] for c in commands if c.function == "move"
-    )
+    extrusion_distance = max(c.parameters["a"] for c in commands if c.function == "move")
 
-    tool0temp = max(
-        c.parameters["temperature"]
-        for c in commands
-        if c.function == "set_toolhead_temperature"
-    )
+    tool0temp = max(c.parameters["temperature"] for c in commands if c.function == "set_toolhead_temperature")
 
-    printcoords = [
-        c.parameters
-        for c in commands
-        if set(c.tags) & {MoveType.Infill.value, MoveType.Leaky.value}
-    ]
+    printcoords = [c.parameters for c in commands if set(c.tags) & {MoveType.Infill.value, MoveType.Leaky.value}]
 
     bbox = {
         "x_max": max(c["x"] for c in printcoords),
@@ -38,9 +26,7 @@ def collectPrinterSettings(
     # assert -0.15 < xrel < 0.15, xrel
     # assert -0.15 < yrel < 0.15, yrel
     # assert  0.95 < zrel < 1.05, zrel
-    assert bbox["z_min"] > 0.0, (
-        f"Potential extrusion collision: z_min = {bbox['z_min']}"
-    )
+    assert bbox["z_min"] > 0.0, f"Potential extrusion collision: z_min = {bbox['z_min']}"
     assert bbox["z_min"] <= 0.5, f"Potential print detachment: z_min = {bbox['z_min']}"
 
     return PrinterSettings(

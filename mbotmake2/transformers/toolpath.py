@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from parsimonious.nodes import NodeVisitor
 
-from mboxmake2.types import Command, CoordE, Coords, CoordZ, MoveType
+from mbotmake2.types import Command, CoordE, Coords, CoordZ, MoveType
 
 RELATIVE_MOVE = {"relative": {"a": False, "x": False, "y": False, "z": False}}
 
@@ -12,9 +12,7 @@ class Logging:
 
     def logUnsupportedCommand(self, line: str) -> None:
         cmd = line.split(" ")[0]
-        assert not (cmd == "G1" and len(line.split(" ")) > 1), (
-            f"Move command ignored: {line}"
-        )
+        assert not (cmd == "G1" and len(line.split(" ")) > 1), f"Move command ignored: {line}"
 
         if cmd in self.unsupported_commands:
             return
@@ -58,15 +56,10 @@ class ToolpathTransformer(NodeVisitor):
 
         if self.extruder_temperature is None or temperature > self.extruder_temperature:
             if self.extruder_temperature is not None:
-                print(
-                    "Overriding extruder temperature: "
-                    f"{self.extruder_temperature} -> {temperature}"
-                )
+                print(f"Overriding extruder temperature: {self.extruder_temperature} -> {temperature}")
             self.extruder_temperature = temperature
 
-        self.commands.append(
-            Command("set_toolhead_temperature", {"temperature": temperature})
-        )
+        self.commands.append(Command("set_toolhead_temperature", {"temperature": temperature}))
 
     def visit_Move(self, node, visited_children) -> None:
         _, (coords,) = visited_children
