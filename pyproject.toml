@@ -20,7 +20,7 @@ test = [
 ]
 
 [project.urls]
-Repository = "http://github.com/antonysigma/mbotmake/"
+Repository = "https://github.com/antonysigma/mbotmake/"
 
 [tool.ruff]
 line-length = 127
