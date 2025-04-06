@@ -1,7 +1,7 @@
 from parsimonious.grammar import Grammar
 
 from mboxmake2.grammars.thumbnails import grammar
-from mboxmake2.transformers.thumbnails import ThumbnailDecoder
+from mboxmake2.transformers.thumbnails import PNGImage, ThumbnailDecoder
 
 thumbnail_raw = r"""
 ;
@@ -51,8 +51,13 @@ def test_thumbnail_parsing() -> None:
     ast = grammar["Thumbnail"].match(thumbnail_raw)
 
     decoder = ThumbnailDecoder()
-    raw = decoder.visit(ast)
+    image: PNGImage = decoder.visit(ast)
 
-    assert isinstance(raw, bytes)
+    h = image.header
+    assert h.width == 55
+    assert h.height == 40
+    assert h.size == 2736
+
+    assert isinstance(image.payload, bytes)
     with open("raw.png", "wb") as image_file:
-        image_file.write(raw)
+        image_file.write(image.payload)

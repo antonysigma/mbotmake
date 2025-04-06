@@ -1,9 +1,7 @@
 from pathlib import Path
 
-from parsimonious.exceptions import IncompleteParseError
-
 from mboxmake2.grammars.thumbnails import grammar
-from mboxmake2.transformers.thumbnails import ThumbnailDecoder
+from mboxmake2.transformers.thumbnails import PNGImage, ThumbnailDecoder
 
 
 def extractThumbnails(
@@ -13,8 +11,9 @@ def extractThumbnails(
         ast = grammar.match(file.read(5_000_000))
 
     decoder = ThumbnailDecoder()
-    thumbnails = decoder.visit(ast)
+    thumbnails: list[PNGImage] = decoder.visit(ast)
 
     for i, t in enumerate(thumbnails):
-        with open(f"{i}.png", "wb") as image_file:
-            image_file.write(t)
+        h = t.header
+        with open(f"thumbnail_{h.width}x{h.height}.png", "wb") as image_file:
+            image_file.write(t.payload)
