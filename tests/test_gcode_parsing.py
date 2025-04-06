@@ -1,5 +1,5 @@
-from mboxmake2.grammars.toolpath import grammar
-from mboxmake2.transformers.toolpath import ToolpathTransformer
+from mbotmake2.grammars.toolpath import grammar
+from mbotmake2.transformers.toolpath import ToolpathTransformer
 
 
 def test_prusa_gcode_file() -> None:

@@ -1,8 +1,8 @@
 from parsimonious.grammar import Grammar
 from pytest import approx
 
-from mboxmake2.grammars.toolpath import STRICT, SYNTAX
-from mboxmake2.transformers.toolpath import ToolpathTransformer
+from mbotmake2.grammars.toolpath import STRICT, SYNTAX
+from mbotmake2.transformers.toolpath import ToolpathTransformer
 
 grammar = Grammar(STRICT + SYNTAX)
 
