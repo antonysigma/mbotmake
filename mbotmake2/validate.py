@@ -1,7 +1,11 @@
 from mbotmake2.types import Command, MoveType, PrinterSettings
 
 
-def collectPrinterSettings(commands: list[Command], z_transitions: int) -> PrinterSettings:
+def collectPrinterSettings(
+    commands: list[Command],
+    z_transitions: int,
+    duration_s: int,
+) -> PrinterSettings:
     toolpathfilelength = len(commands)
     extrusion_distance = max(c.parameters["a"] for c in commands if c.function == "move")
 
@@ -29,8 +33,10 @@ def collectPrinterSettings(commands: list[Command], z_transitions: int) -> Print
     assert bbox["z_min"] > 0.0, f"Potential extrusion collision: z_min = {bbox['z_min']}"
     assert bbox["z_min"] <= 0.5, f"Potential print detachment: z_min = {bbox['z_min']}"
 
+    assert duration_s is not None
+
     return PrinterSettings(
-        duration_s=0.0,
+        duration_s=duration_s,
         total_commands=toolpathfilelength,
         num_z_transitions=z_transitions,
         extruder_temperature=tool0temp,

@@ -56,7 +56,7 @@ class CoordE:
 
 @dataclass
 class PrinterSettings:
-    duration_s: float
+    duration_s: int
     total_commands: int
     num_z_transitions: int
     extruder_temperature: int

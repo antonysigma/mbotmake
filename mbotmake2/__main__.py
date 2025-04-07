@@ -88,7 +88,11 @@ if __name__ == "__main__":
         transformer = decodeGCodefile(input_file)
 
         # Checking toolpath
-        printer_settings = collectPrinterSettings(transformer.commands, transformer.z_transitions)
+        printer_settings = collectPrinterSettings(
+            transformer.commands,
+            transformer.z_transitions,
+            transformer.printing_time_s,
+        )
 
         # Write to meta json file
         print("Generating meta.json...")

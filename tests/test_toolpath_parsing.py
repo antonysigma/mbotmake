@@ -94,3 +94,13 @@ def test_ToolheadTemperature() -> None:
     transformer.visit(ast)
     assert transformer.extruder_temperature is not None
     assert transformer.extruder_temperature == approx(180)
+
+
+def test_PrintingTime() -> None:
+    assert grammar.parse("; estimated printing time (normal mode) = 28m 3s\n")
+    ast = grammar.parse("; estimated printing time (normal mode) = 5h 28m 3s\n")
+
+    transformer = ToolpathTransformer()
+    transformer.visit(ast)
+    assert transformer.printing_time_s is not None
+    assert transformer.printing_time_s == (5 * 3600 + 28 * 60 + 3)

@@ -31,6 +31,7 @@ class ToolpathTransformer(NodeVisitor):
         self.feedrate: float | None = None
         self.z_transitions: int = 0
         self.logging = Logging()
+        self.printing_time_s: int | None = None
 
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
@@ -141,6 +142,35 @@ class ToolpathTransformer(NodeVisitor):
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
         _, value = visited_children
         return Coords(value, 0, 0)
+
+    def visit_PrintingTime(self, _, visited_children) -> None:
+        _, h, m, s = visited_children
+
+        assert self.printing_time_s is None
+        self.printing_time_s = 0
+        if isinstance(h, list):
+            assert isinstance(h[0], int)
+            self.printing_time_s += h[0] * 3600
+
+        if isinstance(m, list):
+            assert isinstance(m[0], int)
+            self.printing_time_s += m[0] * 60
+
+        if isinstance(s, list):
+            assert isinstance(s[0], int)
+            self.printing_time_s += s[0]
+
+    def visit_Hour(self, _, visited_children) -> int:
+        _, value, _ = visited_children
+        return value
+
+    def visit_Minute(self, _, visited_children) -> int:
+        _, value, _ = visited_children
+        return value
+
+    def visit_Second(self, _, visited_children) -> int:
+        _, value, _ = visited_children
+        return value
 
     def generic_visit(self, node, visited_children):
         """The generic visit method."""

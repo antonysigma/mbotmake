@@ -5,18 +5,21 @@ from parsimonious.grammar import Grammar
 NOT_STRICT = (
     "Line = (Move / ResetPosition / FanDuty / ToggleFan "
     "/ ToolheadTemperature / BedTemperature / AbsolutePositioning "
-    "/ Unsupported / Comment) Comment? newline\n\n"
+    "/ Unsupported / Comment) InlineComment? newline\n\n"
 )
 
 STRICT = (
     "Line = (Move / ResetPosition / FanDuty / ToggleFan "
     "/ ToolheadTemperature / BedTemperature / AbsolutePositioning "
-    "/ Comment) Comment? newline\n\n"
+    "/ Comment) InlineComment? newline\n\n"
 )
 
 SYNTAX = r"""
 BlankLine = ~r"[ \t\r]*\n"i
-Comment = ~r"[ \t]*;[^\n]*"i
+Comment = ";" (PrintingTime / IgnoredComment)
+
+IgnoredComment = ~r"[^\n]*"i
+InlineComment = ~r"[ \t]*;[^\n]*"i
 
 ToolheadTemperature = "M104 S" Integer
 BedTemperature = "M140 S" Integer
@@ -34,6 +37,11 @@ CoordE = ExtruderPosition Feedrate
 
 ExtruderPosition = " E" Decimal
 Feedrate = " F" Decimal
+
+PrintingTime = ~r" estimated printing time [^=]*="i Hour? Minute? Second?
+Hour = " " Integer "h"
+Minute = " " Integer "m"
+Second = " " Integer "s"
 
 Integer = ~"[0-9]+"i
 Decimal = ~r"-?(\d+\.\d+|\d+|\.\d+)"i
