@@ -74,7 +74,7 @@ def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
             ExtruderType.SMARTEXTRUDERPLUS,
         )
 
-    return parser.input, MachineType.REPLICATORPlUS, ExtruderType.TOUGHEXTRUDER
+    return args.input, MachineType.REPLICATORPlUS, ExtruderType.TOUGHEXTRUDER
 
 
 if __name__ == "__main__":
