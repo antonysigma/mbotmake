@@ -12,9 +12,9 @@ class Command:
 
 
 class MoveType(Enum):
-    TravelMove = "TravelMove"
+    TravelMove = "Travel Move"
     Infill = "Infill"
-    Leaky = "LeakyTravelMove"
+    Leaky = "Leaky Travel Move"
     Retract = "Retract"
 
 
