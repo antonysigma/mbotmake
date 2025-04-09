@@ -82,6 +82,9 @@ class ToolpathTransformer(NodeVisitor):
         elif isinstance(coords, CoordZ):
             adjusted_z = coords.z + self.global_z_offset
 
+            if coords.feedrate is not None:
+                self.feedrate = coords.feedrate
+
             if adjusted_z > self.current_z:
                 self.z_transitions += 1
 
