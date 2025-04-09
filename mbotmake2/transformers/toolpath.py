@@ -40,6 +40,8 @@ class ToolpathTransformer(NodeVisitor):
         self.is_xyz_absolute: bool = False
         self.is_extrusion_absolute: bool = False
 
+        self.is_fan_on: bool = True
+
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
 
@@ -50,11 +52,15 @@ class ToolpathTransformer(NodeVisitor):
         self.logging.logUnsupportedCommand(node.text)
 
     def visit_FanOff(self, _, __) -> None:
+        self.is_fan_on = False
         self.commands.append(Command("toggle_fan", {"index": 0, "value": False}))
 
     def visit_FanDuty(self, _, visited_children) -> None:
         _, value = visited_children
-        self.commands.append(Command("toggle_fan", {"index": 0, "value": True}))
+        if not self.is_fan_on:
+            self.commands.append(Command("toggle_fan", {"index": 0, "value": True}))
+            self.is_fan_on = True
+
         self.commands.append(Command("fan_duty", {"index": 0, "value": value / 255.0}))
 
     def visit_ResetPosition(self, _, __) -> None:
