@@ -22,16 +22,21 @@ class Logging:
 
 
 class ToolpathTransformer(NodeVisitor):
-    def __init__(self):
-        self.extruder_temperature: float | None = None
+    def __init__(self, global_z_offset: float=-0.05):
         self.commands: list[Command] = []
+
+        self.extruder_temperature: float | None = None
+        self.printing_time_s: int | None = None
+
         self.printer_offset = Coords(0, 0, 0)
         self.cursor = Coords(0, 0, 0)
-        self.current_z: float = 0
+
+        self.global_z_offset: float = global_z_offset
+        self.current_z: float = 0.3
         self.feedrate: float | None = None
         self.z_transitions: int = 0
+
         self.logging = Logging()
-        self.printing_time_s: int | None = None
 
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
@@ -43,11 +48,11 @@ class ToolpathTransformer(NodeVisitor):
         self.logging.logUnsupportedCommand(node.text)
 
     def visit_ToggleFan(self, _, __) -> None:
-        self.commands.append(Command("toggle_fan", {"value": False}))
+        self.commands.append(Command("toggle_fan", {"index": 0, "value": False}))
 
     def visit_FanDuty(self, _, visited_children) -> None:
         _, value = visited_children
-        self.commands.append(Command("fan_duty", {"value": value / 255.0}))
+        self.commands.append(Command("fan_duty", {"index": 0, "value": value / 255.0}))
 
     def visit_ResetPosition(self, _, __) -> None:
         self.printer_offset.a = self.cursor.a
@@ -72,10 +77,13 @@ class ToolpathTransformer(NodeVisitor):
             self.generateMoveECommand(coords)
 
         elif isinstance(coords, CoordZ):
-            if coords.z > self.current_z:
-                self.z_transitions += 1
-                self.current_z = coords.z
+            adjusted_z = coords.z + self.global_z_offset
+            #assert adjusted_z >= self.current_z, "Negative Z travel detected! Sequential printing not supported."
 
+            if adjusted_z > self.current_z:
+                self.z_transitions += 1
+
+            self.current_z = adjusted_z
             self.generateMove2DCommand(Coords(0, 0, 0))
 
         elif isinstance(coords, float):

@@ -104,7 +104,7 @@ if __name__ == "__main__":
             toolpathfile.write("[\n")
 
             for cmd in transformer.commands:
-                json.dump({"command": asdict(cmd)}, toolpathfile, separators=(",", ":"))
+                json.dump({"command": asdict(cmd)}, toolpathfile, sort_keys=True)
                 toolpathfile.write(",\n")
 
             json.dump(asdict(Command("comment", {"comment": "End of print"})), toolpathfile)
