@@ -88,6 +88,9 @@ if __name__ == "__main__":
         transformer = decodeGCodefile(input_file)
 
         # Checking toolpath
+        assert transformer.is_extrusion_absolute, "Fatal: Relative extrusion position detected."
+        assert transformer.is_xyz_absolute, "Fatal: Relative xyz position detected."
+
         printer_settings = collectPrinterSettings(
             transformer.commands,
             transformer.z_transitions,
