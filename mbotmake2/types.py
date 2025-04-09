@@ -23,6 +23,7 @@ class Coords:
     a: float  # Extruder position
     x: float
     y: float
+    feedrate: float | None = None
 
     def __add__(self, x: Self):
         return Coords(
