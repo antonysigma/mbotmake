@@ -3,13 +3,13 @@ from parsimonious.grammar import Grammar
 # ChamberTemperature = "M141"
 
 NOT_STRICT = (
-    "Line = (Move / ResetPosition / FanDuty / ToggleFan "
+    "Line = (Move / ResetPosition / FanDuty / FanOff "
     "/ ToolheadTemperature / BedTemperature / AbsolutePositioning / AbsolutePositioningForExtruders "
     "/ Unsupported / Comment) InlineComment? newline\n\n"
 )
 
 STRICT = (
-    "Line = (Move / ResetPosition / FanDuty / ToggleFan "
+    "Line = (Move / ResetPosition / FanDuty / FanOff "
     "/ ToolheadTemperature / BedTemperature / AbsolutePositioning / AbsolutePositioningForExtruders "
     "/ Comment) InlineComment? newline\n\n"
 )
@@ -24,7 +24,7 @@ InlineComment = ~r"[ \t]*;[^\n]*"i
 ToolheadTemperature = "M104 S" Integer
 BedTemperature = "M140 S" Integer
 FanDuty = "M106 S" Decimal
-ToggleFan = "M107"
+FanOff = "M107"
 Unsupported = ~r"[MG][0-9]+[^\n;]*"i
 
 AbsolutePositioning = "G90"

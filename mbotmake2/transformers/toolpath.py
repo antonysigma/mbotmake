@@ -22,7 +22,7 @@ class Logging:
 
 
 class ToolpathTransformer(NodeVisitor):
-    def __init__(self, global_z_offset: float=-0.05):
+    def __init__(self, global_z_offset: float = -0.05):
         self.commands: list[Command] = []
 
         self.extruder_temperature: float | None = None
@@ -49,11 +49,12 @@ class ToolpathTransformer(NodeVisitor):
     def visit_Unsupported(self, node, _) -> None:
         self.logging.logUnsupportedCommand(node.text)
 
-    def visit_ToggleFan(self, _, __) -> None:
+    def visit_FanOff(self, _, __) -> None:
         self.commands.append(Command("toggle_fan", {"index": 0, "value": False}))
 
     def visit_FanDuty(self, _, visited_children) -> None:
         _, value = visited_children
+        self.commands.append(Command("toggle_fan", {"index": 0, "value": True}))
         self.commands.append(Command("fan_duty", {"index": 0, "value": value / 255.0}))
 
     def visit_ResetPosition(self, _, __) -> None:
@@ -80,7 +81,6 @@ class ToolpathTransformer(NodeVisitor):
 
         elif isinstance(coords, CoordZ):
             adjusted_z = coords.z + self.global_z_offset
-            #assert adjusted_z >= self.current_z, "Negative Z travel detected! Sequential printing not supported."
 
             if adjusted_z > self.current_z:
                 self.z_transitions += 1
