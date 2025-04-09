@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from parsimonious.nodes import NodeVisitor
 
-from mbotmake2.types import Command, CoordE, Coords, CoordZ, MoveType
+from mbotmake2.types import Command, CoordE, Coords, CoordZ, MoveType, detectMoveType
 
 RELATIVE_MOVE = {"relative": {"a": False, "x": False, "y": False, "z": False}}
 
@@ -95,7 +95,14 @@ class ToolpathTransformer(NodeVisitor):
                 self.z_transitions += 1
 
             self.current_z = adjusted_z
-            self.generateMove2DCommand(None)
+            self.commands.append(
+                Command(
+                    "move",
+                    asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
+                    metadata=RELATIVE_MOVE,
+                    tags=[MoveType.Leaky.value],
+                )
+            )
 
         elif isinstance(coords, float):
             self.feedrate = coords
@@ -106,29 +113,33 @@ class ToolpathTransformer(NodeVisitor):
     def generateMoveECommand(self, c: CoordE):
         self.feedrate = c.feedrate
 
-        self.cursor = self.printer_offset + c.extruder_position
+        new_position = self.printer_offset + c.extruder_position
+        move_type = detectMoveType(self.cursor, new_position)
+        self.cursor = new_position
+
         self.commands.append(
             Command(
                 "move",
                 asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
                 metadata=RELATIVE_MOVE,
-                tags=[c.extruder_position.move_type.value],
+                tags=[move_type.value],
             )
         )
 
     def generateMove2DCommand(self, coords: Coords | None) -> None:
         if coords is not None:
-            self.cursor = self.printer_offset + coords
-            tag = coords.move_type
+            new_position = self.printer_offset + coords
+            move_type = detectMoveType(self.cursor, new_position)
+            self.cursor = new_position
         else:
-            tag = MoveType.Leaky
+            move_type = MoveType.Leaky
 
         self.commands.append(
             Command(
                 "move",
                 asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
                 metadata=RELATIVE_MOVE,
-                tags=[tag.value],
+                tags=[move_type.value],
             )
         )
 

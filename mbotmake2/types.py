@@ -31,15 +31,15 @@ class Coords:
             self.y + x.y,
         )
 
-    @property
-    def move_type(self) -> MoveType:
-        if self.a == 0:
-            return MoveType.Leaky
 
-        if self.a > 0:
-            return MoveType.Infill
-
+def detectMoveType(prev: Coords, current: Coords) -> MoveType:
+    if current.a < prev.a:
         return MoveType.Retract
+
+    if current.a > prev.a:
+        return MoveType.Infill
+
+    return MoveType.Leaky
 
 
 @dataclass
