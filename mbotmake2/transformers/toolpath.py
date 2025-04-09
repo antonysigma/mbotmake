@@ -115,9 +115,6 @@ class ToolpathTransformer(NodeVisitor):
         tag = coords.move_type
         # if G0, tag = MoveType.TravelMove
 
-        if coords.feedrate is not None:
-            self.feedrate = coords.feedrate
-
         self.commands.append(
             Command(
                 "move",
@@ -130,16 +127,16 @@ class ToolpathTransformer(NodeVisitor):
     def visit_Coord2D(self, _, visited_children) -> Coords:
         _, x, _, y, extruder_position, feedrate = visited_children
 
-        feedrate: float | None = None
         if isinstance(feedrate, list):
             assert isinstance(feedrate[0], float)
-            feedrate = feedrate[0]
+            self.feedrate = feedrate[0]
 
         if isinstance(extruder_position, list):
             assert isinstance(extruder_position[0], Coords)
-            return Coords(extruder_position[0].a, x, y, feedrate=feedrate)
+            return Coords(extruder_position[0].a, x, y)
 
-        return Coords(0, x, y, feedrate=feedrate)
+        # TODO Don't memorize the extruder position here. Handle it at `visit_Move`
+        return Coords(self.cursor.a - self.printer_offset.a, x, y)
 
     def visit_CoordZ(self, _, visited_children) -> CoordZ:
         _, z, optional_feedrate = visited_children
