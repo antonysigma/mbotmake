@@ -37,6 +37,8 @@ class ToolpathTransformer(NodeVisitor):
         self.z_transitions: int = 0
 
         self.logging = Logging()
+        self.is_xyz_absolute: bool = False
+        self.is_extrusion_absolute: bool = False
 
     def visit_Integer(self, node, _) -> int:
         return int(node.text)
@@ -179,6 +181,12 @@ class ToolpathTransformer(NodeVisitor):
     def visit_Second(self, _, visited_children) -> int:
         _, value, _ = visited_children
         return value
+
+    def visit_AbsolutePositioning(self, _, __) -> None:
+        self.is_xyz_absolute = True
+
+    def visit_AbsolutePositioningForExtruders(self, _, __) -> None:
+        self.is_extrusion_absolute = True
 
     def generic_visit(self, node, visited_children):
         """The generic visit method."""

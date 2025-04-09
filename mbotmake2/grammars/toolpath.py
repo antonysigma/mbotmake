@@ -4,13 +4,13 @@ from parsimonious.grammar import Grammar
 
 NOT_STRICT = (
     "Line = (Move / ResetPosition / FanDuty / ToggleFan "
-    "/ ToolheadTemperature / BedTemperature / AbsolutePositioning "
+    "/ ToolheadTemperature / BedTemperature / AbsolutePositioning / AbsolutePositioningForExtruders "
     "/ Unsupported / Comment) InlineComment? newline\n\n"
 )
 
 STRICT = (
     "Line = (Move / ResetPosition / FanDuty / ToggleFan "
-    "/ ToolheadTemperature / BedTemperature / AbsolutePositioning "
+    "/ ToolheadTemperature / BedTemperature / AbsolutePositioning / AbsolutePositioningForExtruders "
     "/ Comment) InlineComment? newline\n\n"
 )
 
@@ -28,6 +28,7 @@ ToggleFan = "M107"
 Unsupported = ~r"[MG][0-9]+[^\n;]*"i
 
 AbsolutePositioning = "G90"
+AbsolutePositioningForExtruders = "M82"
 ResetPosition = "G92 E" ("0.0" / "0")
 
 Move = "G1" (Coord2D / CoordE / CoordZ / Feedrate)
