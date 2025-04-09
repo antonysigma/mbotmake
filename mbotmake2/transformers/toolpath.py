@@ -89,7 +89,7 @@ class ToolpathTransformer(NodeVisitor):
                 self.z_transitions += 1
 
             self.current_z = adjusted_z
-            self.generateMove2DCommand(Coords(0, 0, 0))
+            self.generateMove2DCommand(None)
 
         elif isinstance(coords, float):
             self.feedrate = coords
@@ -110,10 +110,12 @@ class ToolpathTransformer(NodeVisitor):
             )
         )
 
-    def generateMove2DCommand(self, coords: Coords) -> None:
-        self.cursor = self.printer_offset + coords
-        tag = coords.move_type
-        # if G0, tag = MoveType.TravelMove
+    def generateMove2DCommand(self, coords: Coords | None) -> None:
+        if coords is not None:
+            self.cursor = self.printer_offset + coords
+            tag = coords.move_type
+        else:
+            tag = MoveType.Leaky
 
         self.commands.append(
             Command(
@@ -155,7 +157,7 @@ class ToolpathTransformer(NodeVisitor):
 
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
         _, value = visited_children
-        return Coords(value, 0, 0)
+        return Coords(value, self.cursor.x - self.printer_offset.x, self.cursor.y - self.printer_offset.y)
 
     def visit_PrintingTime(self, _, visited_children) -> None:
         _, h, m, s = visited_children
