@@ -79,36 +79,37 @@ class ToolpathTransformer(NodeVisitor):
     def visit_Move(self, node, visited_children) -> None:
         _, (coords,) = visited_children
 
-        if isinstance(coords, Coords):
-            self.generateMove2DCommand(coords)
+        match coords:
+            case Coords():
+                self.generateMove2DCommand(coords)
 
-        elif isinstance(coords, CoordE):
-            self.generateMoveECommand(coords)
+            case CoordE():
+                self.generateMoveECommand(coords)
 
-        elif isinstance(coords, CoordZ):
-            adjusted_z = coords.z + self.global_z_offset
+            case CoordZ():
+                adjusted_z = coords.z + self.global_z_offset
 
-            if coords.feedrate is not None:
-                self.feedrate = coords.feedrate
+                if coords.feedrate is not None:
+                    self.feedrate = coords.feedrate
 
-            if adjusted_z > self.current_z:
-                self.z_transitions += 1
+                if adjusted_z > self.current_z:
+                    self.z_transitions += 1
 
-            self.current_z = adjusted_z
-            self.commands.append(
-                Command(
-                    "move",
-                    asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
-                    metadata=RELATIVE_MOVE,
-                    tags=[MoveType.Leaky.value],
+                self.current_z = adjusted_z
+                self.commands.append(
+                    Command(
+                        "move",
+                        asdict(self.cursor) | {"feedrate": self.feedrate, "z": self.current_z},
+                        metadata=RELATIVE_MOVE,
+                        tags=[MoveType.Leaky.value],
+                    )
                 )
-            )
 
-        elif isinstance(coords, float):
-            self.feedrate = coords
+            case float():
+                self.feedrate = coords
 
-        else:
-            raise RuntimeError(f"Unknown move command: {node.text}, {coords}")
+            case _:
+                raise RuntimeError(f"Unknown move command: {node.text}, {coords}")
 
     def generateMoveECommand(self, c: CoordE):
         self.feedrate = c.feedrate
