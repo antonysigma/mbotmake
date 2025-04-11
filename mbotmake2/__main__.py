@@ -56,25 +56,23 @@ def packageMBotFile(filename: Path, temp_dir: Path, thumbnail_paths: list[Path])
 
 
 def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
+    """Parse the command-line arguments.
+
+    Following the convention of the GPX project at
+    https://github.com/markwal/GPX, we pass through the machine type with
+    the argument "-m", and the extruder type with "-e".
+    """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--SmartExtPlus", action="store_true")
-    parser.add_argument("--ToughExt", action="store_true")
+    parser.add_argument("-m", "--machine", type=MachineType, chioces=list(MachineType), default=MachineType.REPLICATORPlUS)
+    parser.add_argument(
+        "-e", "--extruder", type=ExtruderType, chioces=list(ExtruderType), default=ExtruderType.SMARTEXTRUDERPLUS
+    )
     parser.add_argument("input", type=Path)
 
     args = parser.parse_args(argv[1:])
 
-    if not (args.SmartExtPlus ^ args.ToughExt):
-        raise ValueError("Should not contain both extruder types")
-
-    if args.SmartExtPlus:
-        return (
-            args.input,
-            MachineType.REPLICATORPlUS,
-            ExtruderType.SMARTEXTRUDERPLUS,
-        )
-
-    return args.input, MachineType.REPLICATORPlUS, ExtruderType.TOUGHEXTRUDER
+    return args.input, args.machine, args.extruder
 
 
 if __name__ == "__main__":
