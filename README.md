@@ -29,15 +29,28 @@ Big notes for making your own config. Origin=middle, extruder absolute not relat
 
 <s>There is global variable at the top of mbotmake called DEBUG this will add each processed line as a "comment" into the jsontool path file I don't know if printing with all that in there will cause issues but it might so I recommend leaving it at False unless you are having weird issues and want to compare gcode-> jsontoolpath directly.</s>
 
-## Installation
-
-To be determined.
-
-<s>There is now a github action that generates a mbotmake.exe for windows users that don't want to have to get python working for this. I hope to eventual split the configuration for the different printers out to property files and come up with a way to change which is being used</s>
-
 <s>I'm adding my orcaslicer configuration for printer and process that seems to be working "well" I'm still having some issues but I think those a physical not gcode/makerbot code.</s>
 
 # Contributing
+## Installation
+
+### Windows users
+
+There is now a github action that generates a mbotmake.exe for windows users that don't want to have to get python working for this. I hope to eventual split the configuration for the different printers out to property files and come up with a way to change which is being used
+
+### Mac and Linux users
+
+Assuming the `UV` python package manager is installed on your computer, run the
+following commands to install the tool into virtual environment.
+
+```shell
+mkdir mbotmake/
+cd mbotmake/
+uv venv --python=3.12
+source .venv/bin/activate
+uv pip install -U git+https://github.com/charely6/mbotmake@experimental
+python3.12 -m mbotmake2 --help
+```
 
 ## Download and configure the project
 
