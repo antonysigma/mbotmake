@@ -17,6 +17,7 @@ version = "0.0.1"
 test = [
     "pytest",
     "ruff",
+    "mypy",
 ]
 
 [project.urls]
