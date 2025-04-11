@@ -25,7 +25,7 @@ class ThumbnailDecoder(NodeVisitor):
         assert isinstance(thumbnails[0], PNGImage)
         return thumbnails
 
-    def visit_Thumbnail(self, _, visited_children) -> tuple[PNGImage]:
+    def visit_Thumbnail(self, _, visited_children) -> PNGImage:
         _, header, chunks, _ = visited_children
 
         assert isinstance(chunks, list)

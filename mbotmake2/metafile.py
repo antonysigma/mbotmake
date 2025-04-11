@@ -83,7 +83,7 @@ def metaJsonExperimentalExtruderPlus(meta: dict):
     return meta
 
 
-METAJSON_PATH = Path(resources.files("mbotmake2")) / "templates/Makerbot_RepPlus.meta.json"
+METAJSON_PATH = resources.files("mbotmake2").joinpath("templates/Makerbot_RepPlus.meta.json")
 
 
 def generateMetajson(
@@ -92,7 +92,7 @@ def generateMetajson(
     machinetype: MachineType,
     extrudertype: ExtruderType,
 ) -> None:
-    with open(METAJSON_PATH, "r") as metajson:
+    with METAJSON_PATH.open("r") as metajson:
         meta = json.load(metajson)
 
     match machinetype:

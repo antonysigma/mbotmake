@@ -4,7 +4,7 @@ from mbotmake2.types import Command, MoveType, PrinterSettings
 def collectPrinterSettings(
     commands: list[Command],
     z_transitions: int,
-    duration_s: int,
+    duration_s: int | None,
 ) -> PrinterSettings:
     toolpathfilelength = len(commands)
     extrusion_distance = max(c.parameters["a"] for c in commands if c.function == "move")
@@ -36,7 +36,7 @@ def collectPrinterSettings(
     assert duration_s is not None
 
     return PrinterSettings(
-        duration_s=duration_s,
+        duration_s=(duration_s if duration_s is not None else 0),
         total_commands=toolpathfilelength,
         num_z_transitions=z_transitions,
         extruder_temperature=tool0temp,
