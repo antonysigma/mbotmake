@@ -70,15 +70,9 @@ class MachineType(Enum):
     REPLICATORMINI = 3
     REPLICATORMINIPLUS = 4
 
-    def __str__(self):
-        return self.value
-
 
 class ExtruderType(Enum):
     SMARTEXTRUDER = 1
     SMARTEXTRUDERPLUS = 2
     TOUGHEXTRUDER = 3
     EXPERIMENTALEXTRUDER = 4
-
-    def __str__(self):
-        return self.value
