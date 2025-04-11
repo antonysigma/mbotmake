@@ -65,16 +65,22 @@ def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "-m", "--machine", type=MachineType, choices=[m.value for m in MachineType], default=MachineType.REPLICATORPlUS.value
+        "-m",
+        "--machine",
+        type=MachineType,
+        choices=[m.value for m in MachineType],
+        default=MachineType.REPLICATORPlUS.value,
+        help="3D printer machine type",
     )
     parser.add_argument(
         "-e",
         "--extruder",
         type=ExtruderType,
-        choices=[e.value for e in ExtruderType],
+        choices=[m.value for m in ExtruderType],
         default=ExtruderType.SMARTEXTRUDERPLUS.value,
+        help="Extruder type",
     )
-    parser.add_argument("input", type=Path)
+    parser.add_argument("input", type=Path, help="Path to the input Gcode file")
 
     args = parser.parse_args(argv[1:])
 

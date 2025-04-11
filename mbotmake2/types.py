@@ -65,14 +65,14 @@ class PrinterSettings:
 
 
 class MachineType(Enum):
-    REPLICATOR5 = 1
-    REPLICATORPlUS = 2
-    REPLICATORMINI = 3
-    REPLICATORMINIPLUS = 4
+    REPLICATOR5 = "Rep5"
+    REPLICATORPlUS = "RepPlus"
+    REPLICATORMINI = "Mini5"
+    REPLICATORMINIPLUS = "MiniPlus"
 
 
 class ExtruderType(Enum):
-    SMARTEXTRUDER = 1
-    SMARTEXTRUDERPLUS = 2
-    TOUGHEXTRUDER = 3
-    EXPERIMENTALEXTRUDER = 4
+    SMARTEXTRUDER = "SmartExt"
+    SMARTEXTRUDERPLUS = "SmartExtPlus"
+    TOUGHEXTRUDER = "ToughExt"
+    EXPERIMENTALEXTRUDER = "ExperimentalExt"
