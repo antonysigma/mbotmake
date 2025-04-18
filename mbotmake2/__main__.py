@@ -68,15 +68,15 @@ def parseArgs(argv: list[str]) -> tuple[Path, MachineType, ExtruderType]:
         "-m",
         "--machine",
         type=MachineType,
-        choices=[m.value for m in MachineType],
-        default=MachineType.REPLICATORPlUS.value,
+        choices=list(MachineType),
+        default=MachineType.REPLICATORPLUS.value,
         help="3D printer machine type",
     )
     parser.add_argument(
         "-e",
         "--extruder",
         type=ExtruderType,
-        choices=[m.value for m in ExtruderType],
+        choices=list(ExtruderType),
         default=ExtruderType.SMARTEXTRUDERPLUS.value,
         help="Extruder type",
     )

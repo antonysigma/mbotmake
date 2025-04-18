@@ -66,9 +66,12 @@ class PrinterSettings:
 
 class MachineType(Enum):
     REPLICATOR5 = "Rep5"
-    REPLICATORPlUS = "RepPlus"
+    REPLICATORPLUS = "RepPlus"
     REPLICATORMINI = "Mini5"
     REPLICATORMINIPLUS = "MiniPlus"
+
+    def __str__(self):
+        return self.value
 
 
 class ExtruderType(Enum):
@@ -76,3 +79,6 @@ class ExtruderType(Enum):
     SMARTEXTRUDERPLUS = "SmartExtPlus"
     TOUGHEXTRUDER = "ToughExt"
     EXPERIMENTALEXTRUDER = "ExperimentalExt"
+
+    def __str__(self):
+        return self.value

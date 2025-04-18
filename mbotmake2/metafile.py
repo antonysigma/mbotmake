@@ -98,7 +98,7 @@ def generateMetajson(
     match machinetype:
         case MachineType.REPLICATOR5:
             meta = metaJson5th(meta)
-        case MachineType.REPLICATORPlUS:
+        case MachineType.REPLICATORPLUS:
             meta = metaJsonPlus(meta)
         case MachineType.REPLICATORMINI:
             meta = metaJsonMini(meta)
