@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 from dataclasses import asdict
 from itertools import islice
+from os import getenv
 from pathlib import Path
 
 from mbotmake2.extract_thumbnails import extractThumbnails
@@ -144,6 +145,13 @@ if __name__ == "__main__":
             )
             toolpathfile.write("\n]\n")
 
-        output_file = input_file.with_suffix(".makerbot")
+        # Determine the output path and output file name
+        preferred_output_name = getenv("SLIC3R_PP_OUTPUT_NAME")
+        output_file = (
+            input_file.with_suffix(".makerbot")
+            if preferred_output_name is None or len(preferred_output_name.strip()) == 0
+            else Path(preferred_output_name).with_suffix(".makerbot")
+        )
+
         print(f"Generating {output_file.name}...")
         packageMBotFile(output_file, temp_dir, thumbnail_paths)
