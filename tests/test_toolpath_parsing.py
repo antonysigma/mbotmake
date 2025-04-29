@@ -1,5 +1,6 @@
+from parsimonious.exceptions import VisitationError
 from parsimonious.grammar import Grammar
-from pytest import approx
+from pytest import approx, raises
 
 from mbotmake2.grammars.toolpath import STRICT, SYNTAX
 from mbotmake2.transformers.toolpath import ToolpathTransformer
@@ -106,3 +107,14 @@ def test_PrintingTime() -> None:
     transformer.visit(ast)
     assert transformer.printing_time_s is not None
     assert transformer.printing_time_s == (5 * 3600 + 28 * 60 + 3)
+
+
+def test_3d_diagonal_move() -> None:
+    assert grammar.parse("G1 X9.495 Y-7.533 Z0.6 F30000\n")
+    ast = grammar.parse("G1 X9.495 Y-7.533 Z0.6 F30000\n")
+
+    transformer = ToolpathTransformer(ZERO_OFFSET)
+    with raises(VisitationError) as error_message:
+        transformer.visit(ast)
+
+    assert "Three-axis move" in str(error_message)

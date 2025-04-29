@@ -31,9 +31,10 @@ AbsolutePositioning = "G90"
 AbsolutePositioningForExtruders = "M82"
 ResetPosition = "G92 E" ("0.0" / "0")
 
-Move = "G1" (Coord2D / CoordE / CoordZ / Feedrate)
-CoordZ = " Z" Decimal Feedrate?
-Coord2D = " X" Decimal " Y" Decimal ExtruderPosition? Feedrate?
+Move = "G1" (Coord3D / Coord2D / CoordE / CoordZ / Feedrate)
+CoordZ = Z Decimal Feedrate?
+Coord2D = X Decimal Y Decimal ExtruderPosition? Feedrate?
+Coord3D = X Decimal Y Decimal Z Decimal Feedrate?
 CoordE = ExtruderPosition Feedrate
 
 ExtruderPosition = " E" Decimal
@@ -43,6 +44,9 @@ PrintingTime = ~r" estimated printing time [^=]*="i Hour? Minute? Second?
 Hour = " " Integer "h"
 Minute = " " Integer "m"
 Second = " " Integer "s"
+X = " X"
+Y = " Y"
+Z = " Z"
 
 Integer = ~"[0-9]+"i
 Decimal = ~r"-?(\d+\.\d+|\d+|\.\d+)"i

@@ -144,6 +144,13 @@ class ToolpathTransformer(NodeVisitor):
             )
         )
 
+    def visit_Coord3D(self, node, _) -> None:
+        raise NotImplementedError(f"""Three-axis move command not supported: {node.text:s}
+
+Did you forget to disable the "sequential printing mode"?
+Reference: https://help.prusa3d.com/article/sequential-printing_124589
+""")
+
     def visit_Coord2D(self, _, visited_children) -> Coords:
         _, x, _, y, extruder_position, feedrate = visited_children
 
