@@ -46,6 +46,34 @@ thumbnail_raw = r"""
 ;
 """
 
+ORCA_THUMBNAIL_CODE = r"""
+; THUMBNAIL_BLOCK_START
+
+;
+; thumbnail begin 55x40 1432
+; iVBORw0KGgoAAAANSUhEUgAAADcAAAAoCAYAAABaW2IIAAAD90lEQVR4Ae2YWU8TURTH5wlBTBSwdK
+; PbUIkx4YHEZzOGiCv6ACoSoOxlLWWHsnSQApZaFgVxS/wo89GO95xyy+10GutD26HpSU7amaFlfv2f
+; 87/njiRVohKVqEQlyijqO5+qNS1+RSqnuNPxWJW/HEDzjyNw76yBY3FaKwtIVAuhMJsiC2ALBsC5NA
+; Pe5C7gNek6xg2PS7HPjGoI5U3sgHWkDyy93WAdD4BtYojSraZUlK5TZKi1Pg93P3SlsrcLbDo4KtVY
+; BKRiBjX/PVmR/jM4mPwtAc7l2Sswlo65IJWlCOY73gN7KFgcuPpXeHNJ4L983csONa/PZagVBufqXI
+; ZqjvAEePa3wHOwnf5uBMPzFqaoVOio9suK/9dJ+p/zdCxMatWyR5HyAMP+wuTHnngUXNEVAkMYfh5N
+; hYMXBc4aDGi+oxg0X3yG5p/HmZDfk1D3rF0V/x5Nw3d6AK7NRTQGcG0tEYz4OfnskKDwVVRLLNeCw1
+; XLXgVvjKf8NQ5GKtpD4+RuqJZre5mZRDfYZ8dILSzDxqFeUoWDiGq5YxtgHR3IACsKnHW0XxPhMElF
+; AYyaPxxEW9d4PzUyi/fsbRIYKm6bGiGzEMFEtSx976Ax0EPvOejN1geqVMiobWtV0QT0gKiIfH4IqF
+; JTZD7dU77jGN2kZaAH3LuRVL8dquA72U/1F3vNVYY8b7c/Ku4aZ5seyQLEdQiVEZPfIP0AcZVKy8Mg
+; PZ+2GeQOQXHT4EqJWXC1cgUzDg3VoBtHNdAQ2LqlX5TxfQqMTR5j/WCbHCa4XGphSeKrVOqoud+ikk
+; mwUky5oJpyQtZXrD/TYHidW3vTxgKd5xA8G96+Ka1aYohzIVq8l/UQGYZgLrw80+ZjZPGXkHjeFGD6
+; udDS/55ckxRk6f99mgbigAhmZPElMY1ckTEXroR0htFNY1XTWhha/pzROoh7NK6WNTiYVY6mUAs3k1
+; d7rnnqKT0YJm40cU3D1JehdWyAjWlT6WPJDKGfC9EU5LP4VVlegnHjyNrGXCaukXitoauz9GWIpoEb
+; RRqLmO1j4k2LfYUOaJsYZOpFsxZkri5P2qOxpaDkPZZriqcFe3edtiX/mgtFOOwthEPzKWmfVft9Ck
+; 74OFLhcwz9YKwfeI3U0oPx765y2BSplFHltCvu6CpbjNmGFKeOi6QhlNFciFA8TWPxYiAclhA9gUp8
+; pImDBmE26HIw3HvxuZCrZGePCPixKSzeKDhc+iENU5HWrPOEYRny5FsU04Jh6OFIxcUZmuSdq6EMBx
+; R7zNRQYujhMK3D7LmiIZjJ1TKKfOBMaRr5Rv3r55oR3LVUyyhuPWxT9XBSuUXdiydabTmoVQmTxF+l
+; ZEkryifmlAAAAABJRU5ErkJggg==
+; thumbnail end
+; THUMBNAIL_BLOCK_END
+"""
+
 
 def test_thumbnail_parsing() -> None:
     ast = grammar["Thumbnail"].match(thumbnail_raw)
@@ -60,4 +88,20 @@ def test_thumbnail_parsing() -> None:
 
     assert isinstance(image.payload, bytes)
     with open("raw.png", "wb") as image_file:
+        image_file.write(image.payload)
+
+
+def test_orca_thumbnail_parsing() -> None:
+    ast = grammar["Thumbnail"].match(ORCA_THUMBNAIL_CODE)
+
+    decoder = ThumbnailDecoder()
+    image: PNGImage = decoder.visit(ast)
+
+    h = image.header
+    assert h.width == 55
+    assert h.height == 40
+    assert h.size == 1432
+
+    assert isinstance(image.payload, bytes)
+    with open("orca-thumbnail.png", "wb") as image_file:
         image_file.write(image.payload)
