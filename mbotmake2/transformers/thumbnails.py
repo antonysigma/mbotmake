@@ -33,7 +33,7 @@ class ThumbnailDecoder(NodeVisitor):
         return PNGImage(header, b64decode(encoded))
 
     def visit_Header(self, _, visited_children) -> ImageMetadata:
-        _, w, _, h, _, s, _ = visited_children
+        _, _, w, _, h, _, s, _ = visited_children
         return ImageMetadata(w, h, s)
 
     def visit_Payload(self, _, visited_children) -> str:

@@ -47,6 +47,8 @@ thumbnail_raw = r"""
 """
 
 ORCA_THUMBNAIL_CODE = r"""
+; THUMBNAIL_BLOCK_START
+
 ;
 ; thumbnail begin 55x40 1432
 ; iVBORw0KGgoAAAANSUhEUgAAADcAAAAoCAYAAABaW2IIAAAD90lEQVR4Ae2YWU8TURTH5wlBTBSwdK
@@ -74,7 +76,7 @@ ORCA_THUMBNAIL_CODE = r"""
 
 
 def test_thumbnail_parsing() -> None:
-    ast = grammar["Thumbnail"].match(thumbnail_raw)
+    ast = grammar["Thumbnail"].parse(thumbnail_raw)
 
     decoder = ThumbnailDecoder()
     image: PNGImage = decoder.visit(ast)
@@ -90,7 +92,7 @@ def test_thumbnail_parsing() -> None:
 
 
 def test_orca_thumbnail_parsing() -> None:
-    ast = grammar["Thumbnail"].match(ORCA_THUMBNAIL_CODE)
+    ast = grammar["Thumbnail"].parse(ORCA_THUMBNAIL_CODE)
 
     decoder = ThumbnailDecoder()
     image: PNGImage = decoder.visit(ast)
