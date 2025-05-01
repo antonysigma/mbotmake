@@ -5,13 +5,13 @@ from parsimonious.grammar import Grammar
 NOT_STRICT = (
     "Line = (Move / ResetPosition / FanDuty / FanOff "
     "/ ToolheadTemperature / BedTemperature / AbsolutePositioning / AbsolutePositioningForExtruders "
-    "/ Unsupported / Comment) InlineComment? newline\n\n"
+    "/ ArcMove / Unsupported / Comment) InlineComment? newline\n\n"
 )
 
 STRICT = (
     "Line = (Move / ResetPosition / FanDuty / FanOff "
     "/ ToolheadTemperature / BedTemperature / AbsolutePositioning / AbsolutePositioningForExtruders "
-    "/ Comment) InlineComment? newline\n\n"
+    "/ ArcMove / Comment) InlineComment? newline\n\n"
 )
 
 SYNTAX = r"""
@@ -25,7 +25,6 @@ ToolheadTemperature = "M104 S" Integer
 BedTemperature = "M140 S" Integer
 FanDuty = "M106 S" Decimal
 FanOff = "M107"
-Unsupported = ~r"[MG][0-9]+[^\n;]*"i
 
 AbsolutePositioning = "G90"
 AbsolutePositioningForExtruders = "M82"
@@ -36,6 +35,9 @@ CoordZ = Z Decimal Feedrate?
 Coord2D = X Decimal Y Decimal ExtruderPosition? Feedrate?
 Coord3D = X Decimal Y Decimal Z Decimal Feedrate?
 CoordE = ExtruderPosition Feedrate
+
+ArcMove = ~r"G[23] [^\n]*"
+Unsupported = ~r"[MG][0-9]+[^\n;]*"i
 
 ExtruderPosition = " E" Decimal
 Feedrate = " F" Decimal

@@ -180,6 +180,12 @@ Reference: https://help.prusa3d.com/article/sequential-printing_124589
     def visit_Feedrate(self, _, visited_children) -> float:
         return visited_children[1] / 60.0
 
+    def visit_ArcMove(self, node, _) -> None:
+        raise NotImplementedError(f"""Arc move not implemented: {node.text:s}
+
+Please disable "Arc fitting" feature in the Slicer:
+Reference: https://wiki.bambulab.com/en/software/bambu-studio/acr-move""")
+
     def visit_ExtruderPosition(self, _, visited_children) -> Coords:
         _, value = visited_children
         return Coords(value, self.cursor.x - self.printer_offset.x, self.cursor.y - self.printer_offset.y)
