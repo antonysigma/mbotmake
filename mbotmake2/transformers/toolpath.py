@@ -74,7 +74,7 @@ class ToolpathTransformer(NodeVisitor):
                 print(f"Overriding extruder temperature: {self.extruder_temperature} -> {temperature}")
             self.extruder_temperature = temperature
 
-        self.commands.append(Command("set_toolhead_temperature", {"temperature": temperature}))
+        self.commands.append(Command("set_toolhead_temperature", {"temperature": temperature, "index": 0}))
 
     def visit_Move(self, node, visited_children) -> None:
         _, (coords,) = visited_children
