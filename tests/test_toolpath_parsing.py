@@ -117,7 +117,18 @@ def test_3d_diagonal_move() -> None:
     with raises(VisitationError) as error_message:
         transformer.visit(ast)
 
-    assert "Three-axis move" in str(error_message)
+    assert "Joint Z and XY move" in str(error_message)
+
+
+def test_yz_diagonal_move() -> None:
+    assert grammar.parse("G1 Y-7.533 Z0.6 F30000\n")
+    ast = grammar.parse("G1 Y-7.533 Z0.6 F30000\n")
+
+    transformer = ToolpathTransformer(ZERO_OFFSET)
+    with raises(VisitationError) as error_message:
+        transformer.visit(ast)
+
+    assert "Joint Z and XY move" in str(error_message)
 
 
 def test_arc_move() -> None:

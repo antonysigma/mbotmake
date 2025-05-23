@@ -33,7 +33,7 @@ ResetPosition = "G92 E" ("0.0" / "0")
 Move = "G1" (Coord3D / Coord2D / CoordE / CoordZ / Feedrate)
 CoordZ = Z Decimal Feedrate?
 Coord2D = X Decimal Y Decimal ExtruderPosition? Feedrate?
-Coord3D = X Decimal Y Decimal Z Decimal Feedrate?
+Coord3D = (X Decimal)? Y Decimal Z Decimal Feedrate?
 CoordE = ExtruderPosition Feedrate
 
 ArcMove = ~r"G[23] [^\n]*"

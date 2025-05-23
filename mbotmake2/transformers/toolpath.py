@@ -145,10 +145,10 @@ class ToolpathTransformer(NodeVisitor):
         )
 
     def visit_Coord3D(self, node, _) -> None:
-        raise NotImplementedError(f"""Three-axis move command not supported: {node.text:s}
+        raise NotImplementedError(f"""Joint Z and XY move command not supported: {node.text:s}
 
-Did you forget to disable the "sequential printing mode"?
-Reference: https://help.prusa3d.com/article/sequential-printing_124589
+Spiral vase printing is not yet supported.
+Reference: https://wiki.bambulab.com/en/software/bambu-studio/spiral-vase
 """)
 
     def visit_Coord2D(self, _, visited_children) -> Coords:
