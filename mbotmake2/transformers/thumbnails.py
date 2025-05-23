@@ -26,7 +26,7 @@ class ThumbnailDecoder(NodeVisitor):
         return thumbnails
 
     def visit_Thumbnail(self, _, visited_children) -> PNGImage:
-        _, header, chunks, _ = visited_children
+        header, chunks, _ = visited_children
 
         assert isinstance(chunks, list)
         encoded = "".join(chunks)
